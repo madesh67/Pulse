@@ -263,35 +263,46 @@
 
 .footerRow {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid #f4f4f8;
+  border-top: 1px solid #f2f2f7;
 
   @media (max-width: 640px) {
-    padding-top: 10px;
+    padding-top: 12px;
   }
 }
 
-.actionLink {
-  display: inline-flex;
+.actionBtn {
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 100px;
+  padding: 10px 16px;
   font-family: $font-sans;
   font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #111111;
-  transition: all 0.2s ease;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   .arrow {
     font-size: 0.95rem;
-    transition: transform 0.2s ease;
+    line-height: 1;
+    transition: transform 0.25s ease;
   }
 
   .cardWrapper:hover & {
-    color: #000000;
+    background-color: #222226;
+    border-color: #222226;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 
     .arrow {
       transform: translateX(4px);
@@ -299,7 +310,9 @@
   }
 
   @media (max-width: 640px) {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
+    padding: 9px 12px;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    min-height: 38px;
   }
 }

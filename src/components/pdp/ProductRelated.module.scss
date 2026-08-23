@@ -148,21 +148,42 @@
 }
 
 .exploreLink {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font-family: $font-sans;
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  font-weight: $fw-semibold;
+  letter-spacing: 0.12em;
+  font-weight: 700;
   text-transform: uppercase;
-  color: $color-text-main;
-  margin-top: 4px;
-  transition: $transition-fast;
-}
+  color: #111111;
+  background-color: #f6f6f9;
+  border: 1px solid #e5e5ea;
+  border-radius: 100px;
+  padding: 9px 16px;
+  margin-top: 10px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
-.arrow {
-  transition: transform 0.2s ease;
+  .arrow {
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+  }
+
+  .cardWrapper:hover & {
+    background-color: #000000;
+    color: #ffffff;
+    border-color: #000000;
+
+    .arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    font-size: 0.68rem;
+    padding: 8px 12px;
+  }
 }
 
 @media (max-width: 768px) {
