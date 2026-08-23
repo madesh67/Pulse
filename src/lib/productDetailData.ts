@@ -73,7 +73,7 @@ export const productDetailsMap: Record<string, ProductDetail> = {
     gallery: [
       {
         id: "hero",
-        src: "/assets/offers/first-time-offer.png",
+        src: "/assets/products/pulse-nova-pro.png",
         alt: "PULSE Nova Pro flagship smartwatch in satin-brushed grade-5 titanium with always-on display",
         label: "Front Elevation",
       },

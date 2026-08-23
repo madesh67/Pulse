@@ -46,7 +46,7 @@ export const shopProducts: ShopProduct[] = [
     material: "Grade-5 Titanium",
     price: "$1,150",
     priceValue: 1150,
-    image: "/assets/offers/first-time-offer.png",
+    image: "/assets/products/pulse-nova-pro.png",
     imageAlt: "PULSE Nova Pro flagship smartwatch standing in grade-5 titanium",
     availability: "In Stock",
     featured: true,
