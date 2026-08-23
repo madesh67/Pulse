@@ -13,6 +13,8 @@
   border: none;
   overflow: hidden;
   z-index: 10;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
 
   @media (max-width: 1024px) {
     padding: 64px 36px 32px;

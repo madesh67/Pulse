@@ -189,17 +189,31 @@ export function useFramePreloader() {
           return;
         }
 
-        const queue: number[] = [];
+        // Tier 1: Priority Keyframes (Immediate Hero 0..12 + Every 4th Frame)
+        const tier1Set = new Set<number>();
+        for (let i = 0; i < Math.min(12, framesCount); i++) {
+          tier1Set.add(i);
+        }
+        for (let i = 12; i < framesCount; i += 4) {
+          tier1Set.add(i);
+        }
+        const tier1Queue = Array.from(tier1Set);
+
+        // Tier 2: Remaining in-between frames
+        const tier2Queue: number[] = [];
         for (let i = 0; i < framesCount; i++) {
-          queue.push(i);
+          if (!tier1Set.has(i)) {
+            tier2Queue.push(i);
+          }
         }
 
         let completedCount = 0;
 
-        const worker = async () => {
-          while (queue.length > 0) {
+        // 1. Process Tier 1 Keyframes with high concurrency
+        const workerTier1 = async () => {
+          while (tier1Queue.length > 0) {
             if (isAborted) return;
-            const idx = queue.shift();
+            const idx = tier1Queue.shift();
             if (idx === undefined) break;
             await loadFrame(idx);
             completedCount++;
@@ -207,21 +221,33 @@ export function useFramePreloader() {
           }
         };
 
-        const workers = Array.from({ length: CONCURRENCY_LIMIT }, () => worker());
-        await Promise.all(workers);
+        await Promise.all(Array.from({ length: CONCURRENCY_LIMIT }, () => workerTier1()));
+
+        if (!isAborted) {
+          // Immediately unlock page rendering and user interactivity with keyframe interpolation
+          setIsTier1Loaded(true);
+          setIsLoading(false);
+        }
+
+        // 2. Process Tier 2 Remaining Frames in background
+        const workerTier2 = async () => {
+          while (tier2Queue.length > 0) {
+            if (isAborted) return;
+            const idx = tier2Queue.shift();
+            if (idx === undefined) break;
+            await loadFrame(idx);
+            completedCount++;
+            updateProgress(completedCount, framesCount);
+          }
+        };
+
+        await Promise.all(Array.from({ length: Math.min(6, CONCURRENCY_LIMIT) }, () => workerTier2()));
 
         if (!isAborted) {
           setProgress(100);
           setLoadedCount(framesCount);
           flushProgressUpdate();
-
-          setTimeout(() => {
-            if (!isAborted) {
-              setIsTier1Loaded(true);
-              setIsFullyLoaded(true);
-              setIsLoading(false);
-            }
-          }, 150);
+          setIsFullyLoaded(true);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);

@@ -14,9 +14,14 @@ import { ProductFeatures } from "../../../components/pdp/ProductFeatures";
 import { ProductSpecs } from "../../../components/pdp/ProductSpecs";
 import { ProductInTheBox } from "../../../components/pdp/ProductInTheBox";
 import { ProductRelated } from "../../../components/pdp/ProductRelated";
+import dynamic from "next/dynamic";
 import { ProductNotFound } from "../../../components/pdp/ProductNotFound";
-import { ReservationModal } from "../../../components/pdp/ReservationModal";
 import styles from "./pdp.module.scss";
+
+const ReservationModal = dynamic(
+  () => import("../../../components/pdp/ReservationModal").then((mod) => mod.ReservationModal),
+  { ssr: false }
+);
 
 interface ProductDetailPageClientProps {
   slug: string;

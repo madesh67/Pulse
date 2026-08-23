@@ -150,3 +150,15 @@ p {
   white-space: nowrap;
   border: 0;
 }
+
+// 6. Performance & Rendering Optimizations
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
+}
+
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
