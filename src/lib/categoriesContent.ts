@@ -39,7 +39,7 @@ export const shopByCategoryContent: ShopByCategoryContent = {
       image: "/assets/categories/smartwatches.jpg",
       imageAlt: "PULSE Smartwatches collection in aerospace grade titanium",
       ctaText: "EXPLORE COLLECTION",
-      href: "#category-smartwatches",
+      href: "/shop?category=smartwatches",
     },
     {
       id: "straps",
@@ -51,7 +51,7 @@ export const shopByCategoryContent: ShopByCategoryContent = {
       image: "/assets/categories/straps.jpg",
       imageAlt: "PULSE interchangeable straps and bands collection",
       ctaText: "EXPLORE COLLECTION",
-      href: "#category-straps",
+      href: "/shop?category=straps",
     },
     {
       id: "editions",
@@ -63,7 +63,7 @@ export const shopByCategoryContent: ShopByCategoryContent = {
       image: "/assets/categories/editions.jpg",
       imageAlt: "PULSE Specialist Editions collection in matte black DLC finish",
       ctaText: "EXPLORE COLLECTION",
-      href: "#category-editions",
+      href: "/shop?category=specialist",
     },
     {
       id: "charging",
@@ -75,7 +75,7 @@ export const shopByCategoryContent: ShopByCategoryContent = {
       image: "/assets/categories/charging.jpg",
       imageAlt: "PULSE magnetic fast charging dock in brushed titanium and white ceramic",
       ctaText: "EXPLORE COLLECTION",
-      href: "#category-charging",
+      href: "/shop?category=charging",
     },
   ],
 };

@@ -1,0 +1,241 @@
+@use '../../styles/variables' as *;
+
+// Luxury Horological Chronometer Curtain Styles
+
+.curtainOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+
+  &.active {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+// 1. Primary Obsidian Titanium Shutter Plate
+.curtainShutter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #18181c 0%,
+    #101013 60%,
+    #0a0a0c 100%
+  );
+  transform: translateY(-100%);
+  will-change: transform;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.85);
+
+  // Subtle brushed metallic texture overlay
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// 2. High-Precision Horizon Gold Hairline
+.curtainHairline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(197, 168, 128, 0.2) 15%,
+    #c5a880 50%,
+    rgba(197, 168, 128, 0.2) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 0 16px rgba(197, 168, 128, 0.6), 0 0 32px rgba(197, 168, 128, 0.3);
+}
+
+// 3. Central Horological Caliber Insignia HUD
+.hudContainer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ffffff;
+  padding: 32px;
+  opacity: 0;
+  transform: scale(0.92);
+  will-change: transform, opacity;
+}
+
+// Precision Dial Aperture Ring (SVG)
+.apertureDial {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .dialSvg {
+    width: 100%;
+    height: 100%;
+    transform-origin: center;
+    animation: rotateDial 12s linear infinite;
+  }
+
+  .escapementHand {
+    position: absolute;
+    width: 2px;
+    height: 38px;
+    background: linear-gradient(to top, transparent, #c5a880);
+    transform-origin: bottom center;
+    bottom: 50%;
+    left: calc(50% - 1px);
+    animation: rotateEscapement 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    box-shadow: 0 0 8px rgba(197, 168, 128, 0.8);
+  }
+
+  .dialCenterDot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #c5a880;
+    box-shadow: 0 0 10px rgba(197, 168, 128, 0.9);
+  }
+}
+
+// Typography in HUD
+.brandTitle {
+  font-family: $font-sans;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.brandSub {
+  font-family: $font-mono;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #c5a880;
+  margin-bottom: 20px;
+}
+
+// Caliber Badge (e.g. CALIBER 01 • ATELIER)
+.caliberBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(197, 168, 128, 0.35);
+  border-radius: 100px;
+  backdrop-filter: blur(8px);
+  margin-bottom: 16px;
+}
+
+.caliberBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #c5a880;
+  box-shadow: 0 0 8px #c5a880;
+  animation: pulseDot 1.4s ease-in-out infinite alternate;
+}
+
+.caliberBadgeText {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f0f0f2;
+}
+
+// Telemetry Metadata Footer
+.telemetry {
+  font-family: $font-mono;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+// Subtle Keyframe Animations
+@keyframes rotateDial {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotateEscapement {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseDot {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+// Reduced Motion Mode
+@media (prefers-reduced-motion: reduce) {
+  .curtainShutter {
+    transform: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  .dialSvg,
+  .escapementHand,
+  .caliberBadgeDot {
+    animation: none !important;
+  }
+}

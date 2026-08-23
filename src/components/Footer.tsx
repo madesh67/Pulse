@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { footerContent } from "../lib/footerContent";
 import styles from "./Footer.module.scss";
 
@@ -14,7 +15,7 @@ export const Footer: React.FC = () => {
         <div className={styles.mainGrid}>
           {/* Column 1: Brand & Socials */}
           <div className={styles.brandCol}>
-            <a href="#" className={styles.brandLogo} aria-label={`${brand.name} Home`}>
+            <Link href="/" className={styles.brandLogo} aria-label={`${brand.name} Home`}>
               <svg
                 className={styles.logoIcon}
                 viewBox="0 0 24 24"
@@ -30,7 +31,7 @@ export const Footer: React.FC = () => {
                 <polyline points="2 12 12 17 22 12" />
               </svg>
               <span className={styles.logoText}>{brand.name}</span>
-            </a>
+            </Link>
 
             <p className={styles.brandDesc}>{brand.description}</p>
 
@@ -105,9 +106,9 @@ export const Footer: React.FC = () => {
             <ul className={styles.linkList}>
               {quickLinks.links.map((link, idx) => (
                 <li key={idx}>
-                  <a href={link.href} className={styles.linkItem}>
+                  <Link href={link.href} className={styles.linkItem}>
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

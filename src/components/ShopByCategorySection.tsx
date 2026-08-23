@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { shopByCategoryContent, CategoryItem } from "../lib/categoriesContent";
@@ -125,7 +126,7 @@ export const ShopByCategorySection: React.FC = () => {
                 </h3>
                 <p className={styles.categoryDescription}>{category.description}</p>
 
-                <a
+                <Link
                   href={category.href}
                   className={styles.exploreCta}
                   aria-label={`Explore ${category.name} category`}
@@ -134,11 +135,11 @@ export const ShopByCategorySection: React.FC = () => {
                   <span className={styles.ctaArrow} aria-hidden="true">
                     &rarr;
                   </span>
-                </a>
+                </Link>
               </div>
 
               {/* Accessible Whole Card Overlay Click Target */}
-              <a
+              <Link
                 href={category.href}
                 className={styles.cardLinkOverlay}
                 tabIndex={-1}

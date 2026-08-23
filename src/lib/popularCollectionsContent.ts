@@ -39,7 +39,7 @@ export const popularCollectionsContent: PopularCollectionsContent = {
       image: "/assets/collections/titanium-heritage.jpg",
       imageAlt: "PULSE Titanium Heritage smartwatch with titanium bracelet",
       ctaText: "EXPLORE COLLECTION",
-      href: "#collection-titanium",
+      href: "/shop/pulse-titanium-heritage",
     },
     {
       id: "hydro-active",
@@ -51,7 +51,7 @@ export const popularCollectionsContent: PopularCollectionsContent = {
       image: "/assets/collections/hydro-active.jpg",
       imageAlt: "PULSE Hydro Active smartwatch with tubular fluoroelastomer ocean strap",
       ctaText: "EXPLORE COLLECTION",
-      href: "#collection-active",
+      href: "/shop/pulse-hydro-active",
     },
     {
       id: "stealth-obsidian",
@@ -63,7 +63,7 @@ export const popularCollectionsContent: PopularCollectionsContent = {
       image: "/assets/collections/stealth-obsidian.jpg",
       imageAlt: "PULSE Stealth Obsidian smartwatch in matte black DLC finish",
       ctaText: "EXPLORE COLLECTION",
-      href: "#collection-stealth",
+      href: "/shop/pulse-stealth-obsidian",
     },
     {
       id: "alpine-expedition",
@@ -75,7 +75,7 @@ export const popularCollectionsContent: PopularCollectionsContent = {
       image: "/assets/collections/alpine-expedition.jpg",
       imageAlt: "PULSE Alpine Expedition smartwatch with woven ballistic nylon strap",
       ctaText: "EXPLORE COLLECTION",
-      href: "#collection-expedition",
+      href: "/shop/pulse-alpine-expedition",
     },
   ],
 };

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { popularCollectionsContent, CollectionItem } from "../lib/popularCollectionsContent";
@@ -125,7 +126,7 @@ export const PopularCollections: React.FC = () => {
                 </h3>
                 <p className={styles.productDescription}>{collection.description}</p>
 
-                <a
+                <Link
                   href={collection.href}
                   className={styles.exploreCta}
                   aria-label={`Explore ${collection.name} collection`}
@@ -134,11 +135,11 @@ export const PopularCollections: React.FC = () => {
                   <span className={styles.ctaArrow} aria-hidden="true">
                     &rarr;
                   </span>
-                </a>
+                </Link>
               </div>
 
               {/* Accessible Whole Card Overlay Click Target */}
-              <a
+              <Link
                 href={collection.href}
                 className={styles.cardLinkOverlay}
                 tabIndex={-1}
