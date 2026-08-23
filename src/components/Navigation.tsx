@@ -311,7 +311,7 @@ export const Navigation: React.FC = () => {
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Navigation Drawer / Sidebar */}
       <div
         className={`${styles.mobileDrawer} ${
           isMobileMenuOpen ? styles.mobileDrawerOpen : ""
@@ -323,13 +323,17 @@ export const Navigation: React.FC = () => {
           onClick={() => setIsMobileMenuOpen(false)}
         />
         <div className={styles.drawerPanel}>
+          {/* Drawer Header */}
           <div className={styles.drawerHeader}>
-            <span className={styles.drawerBrand}>{logo}</span>
+            <div className={styles.drawerBrandGroup}>
+              <span className={styles.drawerBrand}>{logo}</span>
+              <span className={styles.drawerBrandSub}>Haute Horlogerie Atelier</span>
+            </div>
             <button
               type="button"
               className={styles.drawerCloseBtn}
               onClick={() => setIsMobileMenuOpen(false)}
-              aria-label="Close menu"
+              aria-label="Close navigation menu"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -345,7 +349,8 @@ export const Navigation: React.FC = () => {
             </button>
           </div>
 
-          <nav className={styles.drawerNav} aria-label="Mobile Navigation">
+          {/* Primary Navigation Links */}
+          <nav className={styles.drawerNav} aria-label="Mobile Main Navigation">
             {links.map((link, idx) => {
               const isActive = pathname === link.href;
               return (
@@ -356,42 +361,81 @@ export const Navigation: React.FC = () => {
                     isActive ? styles.drawerLinkActive : ""
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  style={{ animationDelay: `${0.05 * (idx + 1)}s` }}
                 >
                   <span className={styles.drawerLinkIndex}>0{idx + 1}</span>
                   <span className={styles.drawerLinkLabel}>{link.label}</span>
+                  <span className={styles.drawerLinkArrow} aria-hidden="true">&rarr;</span>
                 </Link>
               );
             })}
           </nav>
 
+          {/* Boutique Category Shortcuts */}
+          <div className={styles.drawerCategories}>
+            <span className={styles.categorySectionTitle}>Atelier Collections</span>
+            <div className={styles.categoryPillsGrid}>
+              <Link
+                href="/shop?category=smartwatches"
+                className={styles.categoryPill}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Smartwatches
+              </Link>
+              <Link
+                href="/shop?category=editions"
+                className={styles.categoryPill}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Specialist
+              </Link>
+              <Link
+                href="/shop?category=straps"
+                className={styles.categoryPill}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Straps & Bands
+              </Link>
+              <Link
+                href="/shop?category=accessories"
+                className={styles.categoryPill}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Power & Vault
+              </Link>
+            </div>
+          </div>
+
+          {/* User Quick Actions Hub & Primary CTA */}
           <div className={styles.drawerFooter}>
             <div className={styles.drawerActions}>
               <Link
                 href="/wishlist"
                 className={styles.drawerActionBtn}
                 onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={`Wishlist, ${wishlistCount} items`}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
-                <span>Wishlist {wishlistCount > 0 ? `(${wishlistCount})` : ""}</span>
+                <span>Saved {wishlistCount > 0 ? `(${wishlistCount})` : ""}</span>
               </Link>
               <Link
                 href="/account"
                 className={styles.drawerActionBtn}
                 onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Account portal"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-                <span>Account</span>
+                <span>Patron</span>
               </Link>
               <Link
                 href="/cart"
                 className={styles.drawerActionBtn}
                 onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={`Shopping bag, ${cartCount} items`}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
@@ -402,11 +446,12 @@ export const Navigation: React.FC = () => {
               </Link>
             </div>
             <Link
-              href="/#reserve"
+              href="/shop"
               className={styles.drawerCta}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Reserve Nova Pro
+              <span>Explore Boutique Timepieces</span>
+              <span className={styles.drawerCtaArrow} aria-hidden="true">&rarr;</span>
             </Link>
           </div>
         </div>
