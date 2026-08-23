@@ -11,7 +11,10 @@ import React, {
 } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TopProgressBar, TransitionStatus } from "./TopProgressBar";
+import {
+  SatinLouverTransition,
+  TransitionStatus,
+} from "./SatinLouverTransition";
 
 interface PageTransitionContextType {
   status: TransitionStatus;
@@ -48,7 +51,7 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     }
   }
 
-  // Scroll reset and GSAP ScrollTrigger refresh when entering a new route
+  // Scroll reset side-effect when entering a new route
   useEffect(() => {
     if (status === "entering") {
       if (safetyTimerRef.current) {
@@ -56,28 +59,15 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
         safetyTimerRef.current = null;
       }
 
-      // Reset scroll position immediately
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
       if (typeof window !== "undefined") {
         ScrollTrigger.refresh();
       }
-
-      const enterTimer = setTimeout(() => {
-        setStatus("idle");
-        pendingRouteRef.current = null;
-        if (typeof window !== "undefined") {
-          ScrollTrigger.refresh();
-        }
-      }, 350);
-
-      return () => {
-        clearTimeout(enterTimer);
-      };
     }
   }, [status]);
 
-  // Programmatic navigation with top progress bar
+  // Initiate transition
   const navigateTo = useCallback(
     (href: string) => {
       if (typeof window === "undefined") return;
@@ -109,22 +99,49 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
       if (status !== "idle") return;
 
       pendingRouteRef.current = href;
-      setStatus("navigating");
+      setStatus("exiting");
 
       // Safety timeout: Reset to idle if navigation is aborted or taking too long
       if (safetyTimerRef.current) clearTimeout(safetyTimerRef.current);
       safetyTimerRef.current = setTimeout(() => {
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
         setStatus("entering");
-      }, 1500);
-
-      startTransition(() => {
-        router.push(href);
-      });
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      }, 1600);
     },
-    [status, router]
+    [status]
   );
+
+  // Callback when louvers have fully veiled the screen
+  const handleCoverComplete = useCallback(() => {
+    if (!pendingRouteRef.current) {
+      setStatus("idle");
+      return;
+    }
+
+    setStatus("navigating");
+    const nextHref = pendingRouteRef.current;
+
+    startTransition(() => {
+      router.push(nextHref);
+    });
+
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [router]);
+
+  // Callback when louvers have fully revealed the new route
+  const handleRevealComplete = useCallback(() => {
+    setStatus("idle");
+    pendingRouteRef.current = null;
+
+    if (safetyTimerRef.current) {
+      clearTimeout(safetyTimerRef.current);
+      safetyTimerRef.current = null;
+    }
+
+    if (typeof window !== "undefined") {
+      ScrollTrigger.refresh();
+    }
+  }, []);
 
   // Global link click interceptor (bubbling phase)
   useEffect(() => {
@@ -213,8 +230,12 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
         navigateTo,
       }}
     >
-      {/* 1. Minimal Top Chronometer Progress Bar */}
-      <TopProgressBar status={status} />
+      {/* 1. Architectural Satin Louver Transition */}
+      <SatinLouverTransition
+        status={status}
+        onCoverComplete={handleCoverComplete}
+        onRevealComplete={handleRevealComplete}
+      />
 
       {/* 2. Direct clean children with zero transforms or wrappers */}
       {children}

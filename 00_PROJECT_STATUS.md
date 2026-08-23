@@ -1101,18 +1101,21 @@ Strictly utilizes real project categories and dedicated studio assets:
 
 ---
 
-## 29. Phase 29 — Minimalist Kinematic Page Transition System (Status: Completed)
+## 29. Phase 29 — Satin White Louver Page Transition System (Status: Completed)
 
-### 1. Design & Architectural Philosophy
-* **Aesthetic Standard:** Apple & Awwwards minimalist luxury standard. The website's clean, bright, pure-white (`#ffffff`) background is 100% preserved without any jarring dark full-screen curtains or artificial loading locks.
-* **Top Chronometer Hairline Gauge (`TopProgressBar.tsx`):**
-  * Precision 2px hairline pinned at `z-index: 999999` with a radiant gold-obsidian gradient (`linear-gradient(90deg, #1a1a1a, #c5a880, #1a1a1a)`).
-  * Smooth GSAP scrub that advances across the top on navigation, quickly completes to 100%, and dissolves seamlessly upon route resolution.
-* **Kinematic Exit & Staggered Reveal (`PageTransitionProvider.tsx` & `PageEnterAnimation.tsx`):**
-  * **Exit:** Current page gracefully dissolves with a subtle upward drift (`opacity: 0`, `y: -14px`, `filter: blur(2px)`) over 200ms.
-  * **Route Swap:** Instant scroll position reset (`window.scrollTo({ top: 0, left: 0, behavior: "instant" })`) and GSAP ScrollTrigger refresh.
-  * **Enter:** Incoming page mounts through Next.js `template.tsx` with a refined upward reveal (`opacity: 0 -> 1`, `y: 20px -> 0`, `filter: blur(4px) -> blur(0px)`) over 480ms with `power3.out` easing.
-* **Accessibility & Reduced Motion:** Instantaneous swap with no motion transforms when `prefers-reduced-motion: reduce` is active.
+### 1. Architectural Design & Visual Philosophy
+* **Design Standard:** Haute horlogerie boutique aesthetic. When moving between routes, 5 architectural satin-white vertical louvers (`#ffffff` &rarr; `#f5f5f7`) sweep down sequentially with a staggered `power3.inOut` timing curve, meeting in a pristine veil before parting smoothly to reveal the new page.
+* **Centered Atelier Monogram HUD:**
+  * Displays an animated Champagne Gold (`#c5a880`) and Carbon Charcoal 8-point aperture index ring with an active escapement seconds hand.
+  * Wordmark: `PULSE • HAUTE HORLOGERIE • GENÈVE`.
+* **Zero DOM Intrusion / GSAP Pinning Safe:**
+  * Runs entirely on a dedicated fixed layer (`position: fixed; inset: 0; z-index: 999999`).
+  * **Zero wrapper divs and zero CSS transforms/filters** are applied to the page DOM or its ancestors, ensuring GSAP ScrollTrigger pinning and watch canvas animations operate with 100% stability.
+* **Scroll & Route Synchronization:**
+  * Automatically resets scroll position behind the veil (`window.scrollTo({ top: 0, left: 0, behavior: "instant" })`).
+  * Triggers `ScrollTrigger.refresh()` upon unveiling.
+  * Captures internal link clicks smoothly while ignoring hash anchor links (`#reserve`, `#categories`).
+* **Accessibility:** Full `prefers-reduced-motion: reduce` compliance with instant cross-fade.
 * **Build Validation:** `npx tsc --noEmit` &rarr; 0 errors. `npm run lint` &rarr; 0 warnings / 0 errors. `npm run build` &rarr; 27/27 static routes compiled successfully.
 
 
