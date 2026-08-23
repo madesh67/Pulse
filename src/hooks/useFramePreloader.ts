@@ -21,8 +21,9 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// Optimal parallel concurrency for fast parallel frame downloads
-const CONCURRENCY_LIMIT = 12;
+// Parallel worker limits for fast non-blocking frame retrieval
+const INITIAL_CONCURRENCY = 8;
+const BACKGROUND_CONCURRENCY = 4;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -75,51 +76,42 @@ export function useFramePreloader() {
   // Cache of loaded images: index -> HTMLImageElement
   const imageCacheRef = useRef<(HTMLImageElement | null)[]>([]);
 
-  // Set of loaded frame indices for instant O(1) fallback resolution
+  // Set of loaded frame indices for instant O(1) nearest-neighbor fallback resolution
   const loadedIndicesRef = useRef<Set<number>>(new Set());
 
-  // Smooth throttled progress updates
-  const lastStateUpdateRef = useRef<number>(0);
-  const pendingUpdateRef = useRef<{ progress: number; loaded: number } | null>(null);
+  // Smooth progress updates via requestAnimationFrame
+  const lastProgressRef = useRef<number>(0);
   const animationFrameIdRef = useRef<number | null>(null);
-
-  const flushProgressUpdate = useCallback(() => {
-    if (pendingUpdateRef.current) {
-      setProgress(pendingUpdateRef.current.progress);
-      setLoadedCount(pendingUpdateRef.current.loaded);
-      pendingUpdateRef.current = null;
-    }
-  }, []);
 
   const updateProgress = useCallback((loaded: number, targetTotal: number) => {
     const calculatedProgress = Math.min(100, Math.round((loaded / targetTotal) * 100));
-    const now = Date.now();
 
-    pendingUpdateRef.current = { progress: calculatedProgress, loaded };
-
-    if (now - lastStateUpdateRef.current > 20 || loaded === targetTotal) {
-      lastStateUpdateRef.current = now;
-      flushProgressUpdate();
-    } else if (!animationFrameIdRef.current) {
-      animationFrameIdRef.current = requestAnimationFrame(() => {
-        animationFrameIdRef.current = null;
-        flushProgressUpdate();
-      });
+    if (calculatedProgress > lastProgressRef.current) {
+      lastProgressRef.current = calculatedProgress;
+      if (!animationFrameIdRef.current) {
+        animationFrameIdRef.current = requestAnimationFrame(() => {
+          animationFrameIdRef.current = null;
+          setProgress(lastProgressRef.current);
+          setLoadedCount(loaded);
+        });
+      }
     }
-  }, [flushProgressUpdate]);
+  }, []);
 
   useEffect(() => {
     const chosenManifest = deviceConfig.manifest;
     const framesCount = chosenManifest.totalFrames;
     const baseFolder = deviceConfig.folder;
 
-    // Initialize cache array
+    // Reset cache & progress
     imageCacheRef.current = new Array(framesCount).fill(null);
     loadedIndicesRef.current.clear();
+    lastProgressRef.current = 0;
+
     const cache = imageCacheRef.current;
     const loadedIndices = loadedIndicesRef.current;
 
-    // Check for single-frame debugging mode (?frame=120)
+    // Single-frame debugging mode (?frame=120)
     let forceFrame: number | null = null;
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -134,7 +126,7 @@ export function useFramePreloader() {
 
     let isAborted = false;
 
-    // Safe single-frame loader with non-blocking decode & silent error recovery
+    // Single frame loader with non-blocking decode
     const loadFrame = async (index: number): Promise<boolean> => {
       if (isAborted) return false;
       if (cache[index]) return true;
@@ -156,7 +148,7 @@ export function useFramePreloader() {
           cache[index] = img;
           loadedIndices.add(index);
 
-          // Asynchronously decode off the main thread to guarantee instant canvas paint
+          // Asynchronously decode off the main thread
           if ("decode" in img) {
             img.decode().catch(() => {});
           }
@@ -173,7 +165,7 @@ export function useFramePreloader() {
       });
     };
 
-    const startFullPreload = async () => {
+    const startOptimizedPreload = async () => {
       try {
         if (forceFrame !== null) {
           await loadFrame(forceFrame);
@@ -186,41 +178,72 @@ export function useFramePreloader() {
           return;
         }
 
-        // Queue all frames in sequential order
-        const queue: number[] = [];
+        // 1. Build Critical Initial Buffer (~30-36 keyframes for fast ~1.5s 0-100% preloader)
+        const initialBufferSet = new Set<number>();
+        // First 16 frames for immediate hero animation start
+        for (let i = 0; i < Math.min(16, framesCount); i++) {
+          initialBufferSet.add(i);
+        }
+        // Keyframe timeline anchors across the full sequence (every 14 frames)
+        for (let i = 16; i < framesCount; i += 14) {
+          initialBufferSet.add(i);
+        }
+        const initialQueue = Array.from(initialBufferSet);
+        const totalInitial = initialQueue.length;
+
+        // 2. Build Remaining Frames Queue for background streaming
+        const remainingQueue: number[] = [];
         for (let i = 0; i < framesCount; i++) {
-          queue.push(i);
+          if (!initialBufferSet.has(i)) {
+            remainingQueue.push(i);
+          }
         }
 
-        let completedCount = 0;
+        let completedInitial = 0;
 
-        const worker = async () => {
-          while (queue.length > 0) {
+        // Worker for initial buffer: increments progress smoothly from 0% to 100%
+        const initialWorker = async () => {
+          while (initialQueue.length > 0) {
             if (isAborted) return;
-            const idx = queue.shift();
+            const idx = initialQueue.shift();
             if (idx === undefined) break;
             await loadFrame(idx);
-            completedCount++;
-            updateProgress(completedCount, framesCount);
+            completedInitial++;
+            updateProgress(completedInitial, totalInitial);
           }
         };
 
-        // Run download workers in parallel
-        const workers = Array.from({ length: CONCURRENCY_LIMIT }, () => worker());
-        await Promise.all(workers);
+        // Download initial keyframe buffer in parallel
+        await Promise.all(
+          Array.from({ length: INITIAL_CONCURRENCY }, () => initialWorker())
+        );
 
         if (!isAborted) {
+          // Guarantee progress reaches 100% cleanly
           setProgress(100);
-          setLoadedCount(framesCount);
-          flushProgressUpdate();
+          setLoadedCount(totalInitial);
 
-          // Smooth 250ms visual completion pause so user sees 100% complete wave
+          // Brief 200ms grace period so user sees the 100% full wave before fade-out
           setTimeout(() => {
             if (!isAborted) {
               setIsFullyLoaded(true);
               setIsLoading(false);
             }
-          }, 250);
+          }, 200);
+
+          // 3. Background streaming: stream remaining in-between frames smoothly without blocking the UI
+          const backgroundWorker = async () => {
+            while (remainingQueue.length > 0) {
+              if (isAborted) return;
+              const idx = remainingQueue.shift();
+              if (idx === undefined) break;
+              await loadFrame(idx);
+            }
+          };
+
+          Promise.all(
+            Array.from({ length: BACKGROUND_CONCURRENCY }, () => backgroundWorker())
+          );
         }
       } catch (err) {
         console.warn("Preloader notice:", err);
@@ -232,7 +255,7 @@ export function useFramePreloader() {
       }
     };
 
-    startFullPreload();
+    startOptimizedPreload();
 
     return () => {
       isAborted = true;
@@ -240,7 +263,7 @@ export function useFramePreloader() {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-  }, [deviceConfig, updateProgress, flushProgressUpdate]);
+  }, [deviceConfig, updateProgress]);
 
   // Instant O(1) frame accessor with nearest-neighbor fallback
   const getFrameImage = useCallback((index: number): HTMLImageElement | null => {
