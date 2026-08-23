@@ -22,7 +22,6 @@ export const PopularCollections: React.FC = () => {
     // Check system accessibility reduced-motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) {
-      // In reduced motion mode, render elements statically without animation delays
       return;
     }
 
@@ -94,10 +93,11 @@ export const PopularCollections: React.FC = () => {
         {/* 2. Product Grid */}
         <div className={styles.productGrid}>
           {collections.map((collection: CollectionItem, idx: number) => (
-            <article
+            <Link
               key={collection.id}
+              href={collection.href}
               className={styles.productCard}
-              aria-labelledby={`product-title-${collection.id}`}
+              aria-label={`Explore ${collection.name} timepiece`}
             >
               {/* Product Visual */}
               <div className={styles.visualWrapper}>
@@ -121,31 +121,19 @@ export const PopularCollections: React.FC = () => {
                   <span>{collection.category}</span>
                 </div>
 
-                <h3 id={`product-title-${collection.id}`} className={styles.productTitle}>
+                <h3 className={styles.productTitle}>
                   {collection.name}
                 </h3>
                 <p className={styles.productDescription}>{collection.description}</p>
 
-                <Link
-                  href={collection.href}
-                  className={styles.exploreCta}
-                  aria-label={`Explore ${collection.name} collection`}
-                >
+                <div className={styles.exploreCta}>
                   <span>{collection.ctaText}</span>
                   <span className={styles.ctaArrow} aria-hidden="true">
                     &rarr;
                   </span>
-                </Link>
+                </div>
               </div>
-
-              {/* Accessible Whole Card Overlay Click Target */}
-              <Link
-                href={collection.href}
-                className={styles.cardLinkOverlay}
-                tabIndex={-1}
-                aria-hidden="true"
-              />
-            </article>
+            </Link>
           ))}
         </div>
       </div>

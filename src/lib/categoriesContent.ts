@@ -63,7 +63,7 @@ export const shopByCategoryContent: ShopByCategoryContent = {
       image: "/assets/categories/editions.jpg",
       imageAlt: "PULSE Specialist Editions collection in matte black DLC finish",
       ctaText: "EXPLORE COLLECTION",
-      href: "/shop?category=specialist",
+      href: "/shop?category=editions",
     },
     {
       id: "charging",

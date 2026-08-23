@@ -24,16 +24,27 @@ const initialFilterState: ShopFilterState = {
 export const ShopPageClient: React.FC = () => {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter");
+  const categoryParam = searchParams.get("category");
   const [internalCategory, setInternalCategory] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<ShopFilterState>(initialFilterState);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("featured");
   const [gridMode, setGridMode] = useState<"2-col" | "1-col">("2-col");
 
-  // Effective category considers URL query parameter (?filter=popular) unless overridden by user
-  const effectiveCategory = internalCategory !== null
-    ? internalCategory
-    : (filterParam === "popular" ? "popular" : filterState.category);
+  // Effective category considers URL query parameter (?category=... or ?filter=popular) unless overridden by user
+  const effectiveCategory = useMemo(() => {
+    if (internalCategory !== null) return internalCategory;
+    if (filterParam === "popular") return "popular";
+    if (categoryParam) {
+      const cat = categoryParam.toLowerCase();
+      if (cat === "smartwatches" || cat === "straps" || cat === "editions" || cat === "charging" || cat === "popular" || cat === "all") {
+        return cat;
+      }
+      if (cat === "specialist") return "editions";
+      if (cat === "accessories" || cat === "power") return "charging";
+    }
+    return filterState.category;
+  }, [internalCategory, filterParam, categoryParam, filterState.category]);
 
   const activeFilterState = useMemo<ShopFilterState>(() => ({
     ...filterState,

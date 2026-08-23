@@ -22,7 +22,6 @@ export const ShopByCategorySection: React.FC = () => {
     // Check system accessibility reduced-motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) {
-      // In reduced motion mode, render elements statically without animation delays
       return;
     }
 
@@ -94,10 +93,11 @@ export const ShopByCategorySection: React.FC = () => {
         {/* 2. Category Grid */}
         <div className={styles.categoryGrid}>
           {categories.map((category: CategoryItem, idx: number) => (
-            <article
+            <Link
               key={category.id}
+              href={category.href}
               className={styles.categoryCard}
-              aria-labelledby={`category-title-${category.id}`}
+              aria-label={`Shop ${category.name} collection`}
             >
               {/* Category Visual */}
               <div className={styles.visualWrapper}>
@@ -121,31 +121,19 @@ export const ShopByCategorySection: React.FC = () => {
                   <span>{category.categoryTag}</span>
                 </div>
 
-                <h3 id={`category-title-${category.id}`} className={styles.categoryTitle}>
+                <h3 className={styles.categoryTitle}>
                   {category.name}
                 </h3>
                 <p className={styles.categoryDescription}>{category.description}</p>
 
-                <Link
-                  href={category.href}
-                  className={styles.exploreCta}
-                  aria-label={`Explore ${category.name} category`}
-                >
+                <div className={styles.exploreCta}>
                   <span>{category.ctaText}</span>
                   <span className={styles.ctaArrow} aria-hidden="true">
                     &rarr;
                   </span>
-                </Link>
+                </div>
               </div>
-
-              {/* Accessible Whole Card Overlay Click Target */}
-              <Link
-                href={category.href}
-                className={styles.cardLinkOverlay}
-                tabIndex={-1}
-                aria-hidden="true"
-              />
-            </article>
+            </Link>
           ))}
         </div>
       </div>

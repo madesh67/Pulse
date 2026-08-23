@@ -144,6 +144,9 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
   @media (max-width: 767px) {
@@ -151,6 +154,15 @@
     border-radius: 10px;
     padding: 12px 10px 14px;
     border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-text-main;
+    outline-offset: 4px;
   }
 }
 
@@ -312,22 +324,6 @@
       transform: translateX(4px);
     }
   }
-
-  &:focus-visible {
-    outline: 2px solid $color-text-main;
-    outline-offset: 4px;
-  }
-}
-
-// Whole card clickable overlay
-.cardLinkOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  border-radius: 4px;
 
   &:focus-visible {
     outline: 2px solid $color-text-main;
