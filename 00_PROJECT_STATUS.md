@@ -1101,20 +1101,21 @@ Strictly utilizes real project categories and dedicated studio assets:
 
 ---
 
-## 29. Phase 29 — Satin White Louver Page Transition System (Status: Completed)
+## 29. Phase 29 — Liquid Bezier Wave Page Transition System (Status: Completed)
 
-### 1. Architectural Design & Visual Philosophy
-* **Design Standard:** Haute horlogerie boutique aesthetic. When moving between routes, 5 architectural satin-white vertical louvers (`#ffffff` &rarr; `#f5f5f7`) sweep down sequentially with a staggered `power3.inOut` timing curve, meeting in a pristine veil before parting smoothly to reveal the new page.
-* **Centered Atelier Monogram HUD:**
-  * Displays an animated Champagne Gold (`#c5a880`) and Carbon Charcoal 8-point aperture index ring with an active escapement seconds hand.
-  * Wordmark: `PULSE • HAUTE HORLOGERIE • GENÈVE`.
+### 1. Awwwards-Standard Liquid Bezier Curved Wave
+* **Visual Philosophy:** Inspired by organic fluid silk and haute horlogerie fluid mechanics. Navigation triggers an organic curved SVG bezier wave (`Q 50 ${y - curve}`) that sweeps up with convex momentum and an illuminating Champagne Gold horizon hairline arc (`#c5a880`), settling flat at full coverage.
+* **Atelier Escapement Emblem:**
+  * Displays an animated Champagne Gold and white 12-hour SVG index ring with an active escapement seconds hand at the transition apex.
+  * Wordmark: `PULSE • CHRONOMETRY • GENÈVE`.
 * **Zero DOM Intrusion / GSAP Pinning Safe:**
-  * Runs entirely on a dedicated fixed layer (`position: fixed; inset: 0; z-index: 999999`).
-  * **Zero wrapper divs and zero CSS transforms/filters** are applied to the page DOM or its ancestors, ensuring GSAP ScrollTrigger pinning and watch canvas animations operate with 100% stability.
-* **Scroll & Route Synchronization:**
-  * Automatically resets scroll position behind the veil (`window.scrollTo({ top: 0, left: 0, behavior: "instant" })`).
-  * Triggers `ScrollTrigger.refresh()` upon unveiling.
-  * Captures internal link clicks smoothly while ignoring hash anchor links (`#reserve`, `#categories`).
+  * Runs entirely on a dedicated fixed overlay layer (`position: fixed; inset: 0; z-index: 999999; pointer-events: none`).
+  * **Zero wrapper divs and zero CSS transforms/filters** on page content, ensuring GSAP ScrollTrigger pinning and the 496-frame canvas operate with 100% stability.
+* **Navigation & Scroll Synchronization:**
+  * Capturing-phase link interception (`useCapture: true`) guarantees reliable activation on all internal links while preserving anchor scrolling (`#reserve`, `#categories`).
+  * Resets scroll position behind the wave (`window.scrollTo({ top: 0, left: 0, behavior: "instant" })`).
+  * Unveils smoothly as the wave pulls down/off-screen in an inverted dome curve.
+  * Refreshes GSAP ScrollTrigger upon reveal.
 * **Accessibility:** Full `prefers-reduced-motion: reduce` compliance with instant cross-fade.
 * **Build Validation:** `npx tsc --noEmit` &rarr; 0 errors. `npm run lint` &rarr; 0 warnings / 0 errors. `npm run build` &rarr; 27/27 static routes compiled successfully.
 

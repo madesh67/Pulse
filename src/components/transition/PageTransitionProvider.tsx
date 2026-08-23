@@ -12,9 +12,9 @@ import React, {
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  SatinLouverTransition,
+  LiquidWaveTransition,
   TransitionStatus,
-} from "./SatinLouverTransition";
+} from "./LiquidWaveTransition";
 
 interface PageTransitionContextType {
   status: TransitionStatus;
@@ -111,7 +111,7 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     [status]
   );
 
-  // Callback when louvers have fully veiled the screen
+  // Callback when liquid wave has fully covered the screen
   const handleCoverComplete = useCallback(() => {
     if (!pendingRouteRef.current) {
       setStatus("idle");
@@ -128,7 +128,7 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [router]);
 
-  // Callback when louvers have fully revealed the new route
+  // Callback when liquid wave has fully revealed the new route
   const handleRevealComplete = useCallback(() => {
     setStatus("idle");
     pendingRouteRef.current = null;
@@ -236,8 +236,8 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
         navigateTo,
       }}
     >
-      {/* 1. Architectural Satin Louver Transition */}
-      <SatinLouverTransition
+      {/* 1. Liquid Bezier Curved Wave Transition */}
+      <LiquidWaveTransition
         status={status}
         onCoverComplete={handleCoverComplete}
         onRevealComplete={handleRevealComplete}
