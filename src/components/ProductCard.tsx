@@ -9,9 +9,10 @@ import styles from "./ProductCard.module.scss";
 
 interface ProductCardProps {
   product: ShopProduct;
+  gridMode?: "2-col" | "1-col";
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, gridMode = "2-col" }) => {
   const {
     slug,
     name,
@@ -36,7 +37,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <Link
       href={`/shop/${slug}`}
-      className={styles.cardWrapper}
+      className={`${styles.cardWrapper} ${gridMode === "2-col" ? styles.compactMode : ""}`}
       aria-label={`View details for ${name} - ${price}`}
     >
       {/* 1. Image Container */}
@@ -46,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {isNew && <span className={styles.newBadge}>NEW</span>}
         </div>
 
-        {/* Wishlist Button */}
+        {/* Touch-Friendly Wishlist Button */}
         <button
           type="button"
           className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.inWishlist : ""}`}
@@ -73,7 +74,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           height={550}
           loading="lazy"
           className={styles.productImage}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 600px"
         />
       </div>
 

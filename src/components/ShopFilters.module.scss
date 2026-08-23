@@ -1,7 +1,7 @@
 @use '../styles/variables' as *;
 
 // =========================================================================
-// SHOP FILTERS — LUXURY EDITORIAL CONTROLS & EXPANDABLE DRAWER
+// SHOP FILTERS — RESPONSIVE LUXURY EDITORIAL CONTROLS & MOBILE DRAWER
 // =========================================================================
 
 .filtersWrapper {
@@ -9,7 +9,7 @@
   background-color: #ffffff;
   position: sticky;
   top: 74px;
-  z-index: 100;
+  z-index: 90;
   border-bottom: 1px solid #ededf2;
   transition: box-shadow 0.3s ease;
 
@@ -23,120 +23,191 @@
 }
 
 .mainBar {
-  max-width: 1380px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 48px;
+  padding: 14px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
+  gap: 20px;
 
   @media (max-width: 1024px) {
-    padding: 14px 32px;
+    padding: 12px 32px;
   }
 
-  @media (max-width: 768px) {
-    padding: 12px 20px;
+  @media (max-width: 860px) {
+    padding: 10px 16px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: stretch;
+    gap: 10px;
   }
 }
 
 // -------------------------------------------------------------------------
-// 1. Category Quick Tabs
+// 1. Category Quick Tabs Carousel
 // -------------------------------------------------------------------------
-.categoryNav {
+.categoryNavWrapper {
   display: flex;
   align-items: center;
-  gap: 6px;
   overflow-x: auto;
-  max-width: 100%;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-.categoryBtn {
-  background: none;
-  border: none;
-  padding: 8px 14px;
-  font-family: $font-sans;
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #76767c;
-  cursor: pointer;
-  position: relative;
+.categoryNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   white-space: nowrap;
-  border-radius: 4px;
-  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.categoryBtn {
+  background: #f6f6f9;
+  border: 1px solid transparent;
+  padding: 7px 14px;
+  font-family: $font-sans;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #686870;
+  cursor: pointer;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    color: #1a1a1a;
+    color: #111111;
+    background: #ececf2;
   }
 
   &.active {
-    color: #1a1a1a;
+    color: #ffffff;
+    background: #000000;
     font-weight: 700;
+    border-color: #000000;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 14px;
-      right: 14px;
-      height: 2px;
-      background-color: #1a1a1a;
+    .catCountBadge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
     }
   }
 
   &:focus-visible {
-    outline: 2px solid #1a1a1a;
+    outline: 2px solid #000000;
     outline-offset: 2px;
   }
 }
 
+.catCountBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.07);
+  color: #76767c;
+  line-height: 1.2;
+}
+
 // -------------------------------------------------------------------------
-// 2. Right Controls (Filter Toggle, Sort & Count)
+// 2. Action Controls (Search, Sort, Filters, Grid Switch)
 // -------------------------------------------------------------------------
-.rightControls {
+.actionControls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 860px) {
     width: 100%;
     justify-content: space-between;
   }
 }
 
-.productCount {
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 240px;
+
+  @media (max-width: 860px) {
+    flex-grow: 1;
+    min-width: 0;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  stroke: #888892;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 7px 30px 7px 32px;
+  background-color: #f7f7fa;
+  border: 1px solid #e5e5eb;
+  border-radius: 100px;
   font-family: $font-sans;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #76767c;
-  white-space: nowrap;
+  font-size: 0.78rem;
+  color: #1a1a1a;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #94949e;
+    font-size: 0.75rem;
+  }
+
+  &:focus {
+    background-color: #ffffff;
+    border-color: #111111;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.searchClearBtn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #888892;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: #111111;
+  }
+}
+
+.controlButtonsGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .filterToggleBtn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background-color: #f6f6f9;
   border: 1px solid #e2e2e8;
-  border-radius: 6px;
+  border-radius: 100px;
   padding: 7px 14px;
   font-family: $font-sans;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1a1a1a;
   cursor: pointer;
@@ -162,9 +233,33 @@
     }
   }
 
-  &:focus-visible {
-    outline: 2px solid #000000;
-    outline-offset: 2px;
+  @media (max-width: 768px) {
+    display: none; // Hidden on mobile; mobileFilterModalBtn used instead
+  }
+}
+
+.mobileFilterModalBtn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background-color: #000000;
+  border: 1px solid #000000;
+  border-radius: 100px;
+  padding: 7px 14px;
+  font-family: $font-sans;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  cursor: pointer;
+
+  .filterIcon {
+    stroke: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    display: inline-flex;
   }
 }
 
@@ -182,37 +277,41 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   background-color: #000000;
   color: #ffffff;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
 }
 
 .sortWrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+
+  @media (max-width: 600px) {
+    display: none; // Handled in mobile modal
+  }
 }
 
 .sortLabel {
   font-family: $font-sans;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #76767c;
 }
 
 .sortSelect {
-  background-color: #ffffff;
+  background-color: #f7f7fa;
   border: 1px solid #e2e2e8;
-  border-radius: 6px;
+  border-radius: 100px;
   padding: 6px 12px;
   font-family: $font-sans;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 500;
   color: #1a1a1a;
   cursor: pointer;
@@ -222,28 +321,55 @@
   &:hover {
     border-color: #1a1a1a;
   }
+}
 
-  &:focus-visible {
-    outline: 2px solid #1a1a1a;
-    outline-offset: 2px;
+.gridModeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #f6f6f9;
+  border: 1px solid #e2e2e8;
+  color: #55555a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #000000;
+    border-color: #000000;
+  }
+
+  @media (min-width: 861px) {
+    display: none; // Active on tablet/mobile
   }
 }
 
+.gridIcon {
+  width: 16px;
+  height: 16px;
+}
+
 // -------------------------------------------------------------------------
-// 3. Expandable Multi-Facet Filter Drawer
+// 3. Desktop Accordion Drawer
 // -------------------------------------------------------------------------
-.drawer {
+.desktopDrawer {
   background-color: #fbfbfd;
   border-top: 1px solid #ededf2;
   border-bottom: 1px solid #ededf2;
   overflow: hidden;
-  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (max-width: 768px) {
+    display: none; // Uses mobile modal
+  }
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
@@ -252,33 +378,19 @@
 }
 
 .drawerContainer {
-  max-width: 1380px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 48px 24px;
+  padding: 28px 48px 20px;
 
   @media (max-width: 1024px) {
-    padding: 24px 32px 20px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px 20px 16px;
+    padding: 22px 32px 18px;
   }
 }
 
 .facetGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-  }
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
+  gap: 28px;
 }
 
 .facetColumn {
@@ -288,29 +400,29 @@
 
 .facetTitle {
   font-family: $font-sans;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #1a1a1a;
-  margin: 0 0 14px 0;
-  padding-bottom: 8px;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
   border-bottom: 1px solid #e8e8ee;
 }
 
 .optionList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .optionBtn {
   background: none;
   border: 1px solid transparent;
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: $font-sans;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: #55555a;
   text-align: left;
@@ -318,7 +430,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 
   &:hover {
     color: #1a1a1a;
@@ -331,25 +443,19 @@
     background-color: #eaeaf2;
     border-color: #d1d1de;
   }
-
-  &:focus-visible {
-    outline: 2px solid #000000;
-    outline-offset: 2px;
-  }
 }
 
 .checkIndicator {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
-// Drawer Footer Actions
 .drawerFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 24px;
-  margin-top: 24px;
+  padding-top: 20px;
+  margin-top: 20px;
   border-top: 1px solid #ededf2;
 }
 
@@ -357,14 +463,13 @@
   background: none;
   border: none;
   font-family: $font-sans;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #76767c;
   text-decoration: underline;
   cursor: pointer;
-  padding: 6px 0;
 
   &:hover {
     color: #1a1a1a;
@@ -375,12 +480,12 @@
   background-color: #000000;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 9px 20px;
+  border-radius: 100px;
+  padding: 8px 22px;
   font-family: $font-sans;
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -391,15 +496,15 @@
 }
 
 // -------------------------------------------------------------------------
-// 4. Active Filter Chips Bar
+// 4. Active Chips Bar
 // -------------------------------------------------------------------------
 .chipsBar {
-  max-width: 1380px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 10px 48px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   border-top: 1px solid #f2f2f7;
 
@@ -408,15 +513,15 @@
   }
 
   @media (max-width: 768px) {
-    padding: 8px 20px;
+    padding: 8px 16px;
   }
 }
 
 .chipLabel {
   font-family: $font-sans;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #76767c;
 }
@@ -430,7 +535,7 @@
   border-radius: 100px;
   padding: 3px 10px 3px 12px;
   font-family: $font-sans;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #1a1a1a;
 }
@@ -438,14 +543,12 @@
 .chipRemoveBtn {
   background: none;
   border: none;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #76767c;
   cursor: pointer;
   padding: 0;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: color 0.15s ease;
 
   &:hover {
     color: #000000;
@@ -456,7 +559,7 @@
   background: none;
   border: none;
   font-family: $font-sans;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -468,4 +571,297 @@
     color: #000000;
     text-decoration: underline;
   }
+}
+
+// -------------------------------------------------------------------------
+// 5. Mobile Dedicated Filter Bottom-Sheet / Modal
+// -------------------------------------------------------------------------
+.mobileModalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mobileModalContent {
+  background-color: #ffffff;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.mobileModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #ededf2;
+}
+
+.modalHeaderTitleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileModalTitle {
+  font-family: $font-sans;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111111;
+  margin: 0;
+}
+
+.mobileModalSubtitle {
+  font-size: 0.75rem;
+  color: #76767c;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.mobileModalCloseBtn {
+  background: #f1f1f5;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobileModalBody {
+  padding: 20px 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobileFacetSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobileFacetTitle {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #111111;
+  margin: 0;
+}
+
+.mobileSearchWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.mobileSearchInput {
+  width: 100%;
+  padding: 12px 36px 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e8;
+  background: #f7f7fa;
+  font-family: $font-sans;
+  font-size: 0.88rem;
+  color: #111111;
+  outline: none;
+
+  &:focus {
+    background: #ffffff;
+    border-color: #000000;
+  }
+}
+
+.mobileSearchClearBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #888892;
+  cursor: pointer;
+}
+
+.mobilePillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mobilePillBtn {
+  background: #f5f5f8;
+  border: 1px solid #e5e5eb;
+  border-radius: 100px;
+  padding: 9px 15px;
+  font-family: $font-sans;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #333338;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  transition: all 0.15s ease;
+
+  &.mobilePillActive {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+    font-weight: 700;
+
+    .mobilePillCount {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+.mobilePillCount {
+  font-size: 0.72rem;
+  color: #888892;
+}
+
+.mobileModalFooter {
+  padding: 16px 24px 28px;
+  border-top: 1px solid #ededf2;
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+}
+
+.mobileModalResetBtn {
+  flex: 1;
+  background: #f4f4f7;
+  border: 1px solid #e2e2e8;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: $font-sans;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #55555a;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mobileModalApplyBtn {
+  flex: 2;
+  background: #000000;
+  border: 1px solid #000000;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: $font-sans;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+// -------------------------------------------------------------------------
+// 6. Mobile Floating Filter / Quick Action Bar
+// -------------------------------------------------------------------------
+.mobileFloatingBar {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  background: rgba(18, 18, 20, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 100px;
+  padding: 6px 14px 6px 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  align-items: center;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+
+.floatingFilterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-family: $font-sans;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.floatingIcon {
+  width: 14px;
+  height: 14px;
+  stroke: #000000;
+}
+
+.floatingBadge {
+  background: #000000;
+  color: #ffffff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floatingCount {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #d1d1d8;
+  white-space: nowrap;
 }

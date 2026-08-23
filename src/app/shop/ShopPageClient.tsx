@@ -26,7 +26,9 @@ export const ShopPageClient: React.FC = () => {
   const filterParam = searchParams.get("filter");
   const [internalCategory, setInternalCategory] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<ShopFilterState>(initialFilterState);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("featured");
+  const [gridMode, setGridMode] = useState<"2-col" | "1-col">("2-col");
 
   // Effective category considers URL query parameter (?filter=popular) unless overridden by user
   const effectiveCategory = internalCategory !== null
@@ -51,11 +53,29 @@ export const ShopPageClient: React.FC = () => {
   const handleResetFilters = () => {
     setInternalCategory("all");
     setFilterState(initialFilterState);
+    setSearchQuery("");
+  };
+
+  const handleToggleGridMode = () => {
+    setGridMode((prev) => (prev === "2-col" ? "1-col" : "2-col"));
   };
 
   // Filter & sort products
   const filteredProducts = useMemo(() => {
     let result: ShopProduct[] = [...shopProducts];
+
+    // 0. Keyword Search Filter
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.descriptor.toLowerCase().includes(q) ||
+          p.material.toLowerCase().includes(q) ||
+          p.categoryLabel.toLowerCase().includes(q) ||
+          p.slug.toLowerCase().includes(q)
+      );
+    }
 
     // 1. Category / Popular Filter
     if (activeFilterState.category === "popular") {
@@ -137,7 +157,7 @@ export const ShopPageClient: React.FC = () => {
     }
 
     return result;
-  }, [activeFilterState, selectedSort]);
+  }, [activeFilterState, searchQuery, selectedSort]);
 
   return (
     <div className={styles.shopWrapper}>
@@ -151,6 +171,8 @@ export const ShopPageClient: React.FC = () => {
 
         {/* Multi-Facet Filter Component */}
         <ShopFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
           filterState={activeFilterState}
           onUpdateFilter={handleUpdateFilter}
           onResetFilters={handleResetFilters}
@@ -158,12 +180,15 @@ export const ShopPageClient: React.FC = () => {
           onSelectSort={setSelectedSort}
           filteredCount={filteredProducts.length}
           totalCount={shopProducts.length}
+          gridMode={gridMode}
+          onToggleGridMode={handleToggleGridMode}
         />
 
-        {/* Editorial 2-Column Product Grid */}
+        {/* Responsive CSS Product Grid */}
         <ProductGrid
           products={filteredProducts}
           onClearFilters={handleResetFilters}
+          gridMode={gridMode}
         />
       </main>
 
