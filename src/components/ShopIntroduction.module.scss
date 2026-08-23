@@ -1,0 +1,74 @@
+@use '../styles/variables' as *;
+
+.introWrapper {
+  width: 100%;
+  padding-top: 140px;
+  padding-bottom: 48px;
+  background-color: #ffffff;
+
+  @media (max-width: 1024px) {
+    padding-top: 120px;
+    padding-bottom: 36px;
+  }
+
+  @media (max-width: 768px) {
+    padding-top: 100px;
+    padding-bottom: 28px;
+  }
+}
+
+.container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 48px;
+
+  @media (max-width: 1024px) {
+    padding: 0 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
+}
+
+.introMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tagline {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #76767c;
+}
+
+.divider {
+  width: 20px;
+  height: 1px;
+  background-color: #d1d1d8;
+}
+
+.mainTitle {
+  font-family: $font-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  max-width: 840px;
+}
+
+.introDescription {
+  font-family: $font-sans;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  line-height: 1.65;
+  color: #55555a;
+  max-width: 680px;
+  margin: 0;
+}

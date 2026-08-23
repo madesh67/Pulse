@@ -1,0 +1,354 @@
+@use '../../styles/variables' as *;
+
+.panelWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-left: 12px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.categoryBadgeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryBadge {
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $color-text-light;
+  font-weight: $fw-semibold;
+}
+
+.materialBadge {
+  font-family: $font-sans;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  background: #f4f4f7;
+  color: $color-text-muted;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid #e2e2e6;
+}
+
+.newBadge {
+  font-family: $font-sans;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-weight: $fw-medium;
+}
+
+.availabilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-weight: $fw-medium;
+
+  .statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  &.inStockBadge {
+    color: #247a46;
+    .statusDot {
+      background: #247a46;
+    }
+  }
+
+  &.limitedBadge {
+    color: #9c5c16;
+    .statusDot {
+      background: #c27d2c;
+    }
+  }
+}
+
+.productName {
+  font-family: $font-sans;
+  font-size: 2.3rem;
+  font-weight: $fw-light;
+  letter-spacing: -0.01em;
+  color: $color-text-main;
+  line-height: 1.15;
+  margin: 0 0 10px 0;
+}
+
+.descriptor {
+  font-family: $font-sans;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: $color-text-muted;
+  margin: 0 0 20px 0;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+
+.priceDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.priceValue {
+  font-family: $font-sans;
+  font-size: 1.85rem;
+  font-weight: $fw-medium;
+  letter-spacing: -0.02em;
+  color: $color-text-main;
+}
+
+.taxNotice {
+  font-family: $font-sans;
+  font-size: 0.76rem;
+  color: $color-text-light;
+}
+
+.divider {
+  height: 1px;
+  background: #ebebee;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.configSection {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.variantGroup {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.groupTitle {
+  font-family: $font-sans;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: $fw-semibold;
+  color: $color-text-main;
+}
+
+.selectedLabel {
+  font-family: $font-sans;
+  font-size: 0.78rem;
+  color: $color-text-muted;
+}
+
+.optionList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.optionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #dcdee2;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-family: $font-sans;
+  font-size: 0.82rem;
+  font-weight: $fw-regular;
+  color: $color-text-main;
+  cursor: pointer;
+  transition: $transition-fast;
+  outline: none;
+
+  &:hover {
+    border-color: #9999a0;
+    background: #fafafc;
+  }
+
+  &:focus-visible {
+    border-color: $color-text-main;
+    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.2);
+  }
+}
+
+.activeOption {
+  border-color: $color-text-main;
+  background: #1a1a1a;
+  color: #ffffff;
+
+  &:hover {
+    background: #000000;
+    border-color: #000000;
+  }
+
+  .priceDelta {
+    color: #d0d0d4;
+  }
+}
+
+.colorSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.optionText {
+  white-space: nowrap;
+}
+
+.priceDelta {
+  font-size: 0.74rem;
+  color: $color-text-light;
+  margin-left: 2px;
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.primaryCta {
+  width: 100%;
+  background: $color-accent;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 18px 28px;
+  font-family: $font-sans;
+  font-size: 0.84rem;
+  letter-spacing: 0.16em;
+  font-weight: $fw-semibold;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: $transition-normal;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background: $color-accent-hover;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+
+    .ctaArrow {
+      transform: translateX(4px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 4px;
+  }
+}
+
+.ctaArrow {
+  font-size: 1.1rem;
+  transition: transform 0.25s ease;
+}
+
+.actionNote {
+  font-family: $font-sans;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: $color-text-light;
+  text-align: center;
+  margin: 0;
+}
+
+.servicesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 24px;
+  border-top: 1px solid #ebebee;
+}
+
+.serviceItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.serviceIcon {
+  width: 20px;
+  height: 20px;
+  color: $color-text-main;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.serviceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: $font-sans;
+
+  strong {
+    font-size: 0.82rem;
+    font-weight: $fw-medium;
+    color: $color-text-main;
+  }
+
+  span {
+    font-size: 0.76rem;
+    color: $color-text-light;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 900px) {
+  .panelWrapper {
+    padding-left: 0;
+  }
+
+  .productName {
+    font-size: 1.95rem;
+  }
+
+  .priceValue {
+    font-size: 1.6rem;
+  }
+}

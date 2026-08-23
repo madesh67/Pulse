@@ -1,0 +1,68 @@
+// Premium Smartwatch E-Commerce design tokens - White Master Visual Environment
+
+// 1. Color System (Crisp, luxurious pure white environment)
+$color-bg-base: #ffffff;        // Clean pure white environment matching frame background
+$color-text-main: #1a1a1a;      // Premium dark charcoal for readable body copy
+$color-text-muted: #55555a;     // Elegant mid-grey for secondary/caption details (improved contrast)
+$color-text-light: #76767c;     // Light grey for captions and minor metadata (improved contrast)
+$color-border: #e2e2e5;         // Subtle, soft borders
+$color-surface-subtle: #ffffff; // Soft pure white surface for overlays/cards
+$color-accent: #1a1a1a;         // Clean near-black for premium buttons and accents
+$color-accent-hover: #000000;   // Solid black hover state
+
+// 2. Typography Foundation (Restrained Editorial System)
+// Default sans-serif system that is easily replaced by high-end brand fonts later
+$font-sans: var(--font-sans), 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-serif: var(--font-serif), 'Cormorant Garamond', Georgia, serif; // Editorial serif pairing
+$font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+// Font Size Scale (Mobile-first, dynamic fluid type scaled later)
+$fs-display: 3.5rem;   // Large hero typography
+$fs-h1: 2.5rem;        // Major section headings
+$fs-h2: 1.8rem;        // Subsection titles
+$fs-h3: 1.4rem;        // Card/item titles
+$fs-body: 1rem;        // Standard readability size
+$fs-caption: 0.85rem;  // Explanatory footnotes
+$fs-nav: 0.9rem;       // Clean navigation items
+$fs-button: 0.85rem;   // Button labels
+
+// Font Weights
+$fw-light: 300;
+$fw-regular: 400;
+$fw-medium: 500;
+$fw-semibold: 600;
+$fw-bold: 700;
+
+// 3. Spacing System (8px Grid-based)
+$spacing-xxs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+$spacing-xxl: 64px;
+$spacing-huge: 96px;
+
+// 4. Layout Boundaries
+$layout-max-width: 1440px;
+$layout-content-width: 1200px;
+$layout-header-height: 80px;
+
+// 5. Border Radii
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 16px;
+$radius-full: 9999px;
+
+// 6. Animation Transitions
+$transition-fast: all 0.2s ease;
+$transition-normal: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition-slow: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+// 7. Z-Index Layers
+$z-under: -10;
+$z-base: 1;
+$z-content: 10;
+$z-overlay: 100;
+$z-header: 500;
+$z-preloader: 1000;

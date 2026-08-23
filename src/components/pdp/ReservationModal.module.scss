@@ -1,0 +1,286 @@
+@use '../../styles/variables' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: $z-preloader;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.modalCard {
+  background: #ffffff;
+  border: 1px solid #e0e0e5;
+  border-radius: 8px;
+  max-width: 540px;
+  width: 100%;
+  padding: 36px 32px;
+  position: relative;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: $color-text-light;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: $transition-fast;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    color: $color-text-main;
+    background: #f4f4f7;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+  }
+}
+
+.modalHeader {
+  margin-bottom: 24px;
+}
+
+.atelierTag {
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $color-text-light;
+  font-weight: $fw-semibold;
+  margin-bottom: 8px;
+}
+
+.modalTitle {
+  font-family: $font-serif;
+  font-size: 1.95rem;
+  font-weight: $fw-light;
+  color: $color-text-main;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+}
+
+.modalSubtitle {
+  font-family: $font-sans;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: $color-text-muted;
+  margin: 0;
+}
+
+.productSummaryBox {
+  display: flex;
+  gap: 18px;
+  background: #fbfbfb;
+  border: 1px solid #ededf0;
+  border-radius: 6px;
+  padding: 18px;
+  margin-bottom: 22px;
+}
+
+.thumbWrapper {
+  width: 72px;
+  height: 72px;
+  background: #ffffff;
+  border: 1px solid #eaeaee;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summaryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.summaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.productName {
+  font-family: $font-sans;
+  font-size: 1.05rem;
+  font-weight: $fw-semibold;
+  color: $color-text-main;
+}
+
+.productPrice {
+  font-family: $font-sans;
+  font-size: 1.15rem;
+  font-weight: $fw-medium;
+  color: $color-text-main;
+}
+
+.configBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.configBadge {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  background: #ffffff;
+  border: 1px solid #e2e2e6;
+  border-radius: 3px;
+  padding: 2px 8px;
+  color: $color-text-muted;
+
+  strong {
+    color: $color-text-main;
+    font-weight: $fw-medium;
+  }
+}
+
+.noticeBox {
+  display: flex;
+  gap: 12px;
+  background: #f8f9fc;
+  border: 1px solid #e3e6f0;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 26px;
+}
+
+.noticeIcon {
+  width: 18px;
+  height: 18px;
+  color: #3b5998;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noticeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: $font-sans;
+
+  strong {
+    font-size: 0.78rem;
+    font-weight: $fw-medium;
+    color: $color-text-main;
+  }
+
+  span {
+    font-size: 0.74rem;
+    color: $color-text-muted;
+    line-height: 1.4;
+  }
+}
+
+.actionsRow {
+  display: flex;
+  gap: 12px;
+}
+
+.continueBtn {
+  flex: 1;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 14px 20px;
+  font-family: $font-sans;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  font-weight: $fw-semibold;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: #000000;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+  }
+}
+
+.shopBtn {
+  flex: 1;
+  background: #ffffff;
+  color: $color-text-main;
+  border: 1px solid #dcdee2;
+  border-radius: 4px;
+  padding: 14px 20px;
+  font-family: $font-sans;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  font-weight: $fw-semibold;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: $transition-fast;
+
+  &:hover {
+    background: #fafafc;
+    border-color: #9999a0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .modalCard {
+    padding: 26px 20px;
+  }
+
+  .modalTitle {
+    font-size: 1.6rem;
+  }
+
+  .actionsRow {
+    flex-direction: column;
+  }
+}

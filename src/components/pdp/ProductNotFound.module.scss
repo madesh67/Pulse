@@ -1,0 +1,89 @@
+@use '../../styles/variables' as *;
+
+.notFoundWrapper {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  background: #ffffff;
+}
+
+.contentCard {
+  max-width: 520px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandTag {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $color-text-light;
+  font-weight: $fw-semibold;
+}
+
+.title {
+  font-family: $font-serif;
+  font-size: 2.8rem;
+  font-weight: $fw-light;
+  color: $color-text-main;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.description {
+  font-family: $font-sans;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: $color-text-muted;
+  margin: 0 0 16px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.backButton {
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 14px 28px;
+  border-radius: 4px;
+  font-family: $font-sans;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  font-weight: $fw-semibold;
+  text-decoration: none;
+  transition: $transition-fast;
+
+  &:hover {
+    background: #000000;
+    transform: translateY(-2px);
+  }
+}
+
+.homeButton {
+  background: #ffffff;
+  color: $color-text-main;
+  border: 1px solid #dcdee2;
+  padding: 14px 28px;
+  border-radius: 4px;
+  font-family: $font-sans;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  font-weight: $fw-semibold;
+  text-decoration: none;
+  transition: $transition-fast;
+
+  &:hover {
+    background: #fafafc;
+    border-color: #9999a0;
+  }
+}

@@ -1,0 +1,57 @@
+@use '../../../styles/variables' as *;
+
+.pdpContainer {
+  min-height: 100vh;
+  background-color: #ffffff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentBoundary {
+  max-width: $layout-content-width;
+  margin: 0 auto;
+  padding: calc(#{$layout-header-height} + 24px) 24px 60px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.topSection {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.galleryColumn {
+  width: 100%;
+  position: sticky;
+  top: calc(#{$layout-header-height} + 16px);
+}
+
+.purchaseColumn {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .topSection {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 900px) {
+  .contentBoundary {
+    padding: calc(#{$layout-header-height} + 12px) 16px 40px 16px;
+  }
+
+  .topSection {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .galleryColumn {
+    position: static;
+  }
+}

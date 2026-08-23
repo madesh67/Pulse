@@ -1,0 +1,157 @@
+@use '../styles/variables' as *;
+
+.controlsWrapper {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 0 0 36px 0;
+  position: sticky;
+  top: 74px;
+  z-index: 100;
+  border-bottom: 1px solid #ededf2;
+
+  @media (max-width: 768px) {
+    top: 64px;
+    padding-bottom: 24px;
+  }
+}
+
+.container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    padding: 0 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+// -------------------------------------------------------------------------
+// 1. Category Navigation Tabs
+// -------------------------------------------------------------------------
+.categoryNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  max-width: 100%;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.categoryBtn {
+  background: none;
+  border: none;
+  padding: 8px 14px;
+  font-family: $font-sans;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #76767c;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  border-radius: 4px;
+  transition: color 0.25s ease, background-color 0.25s ease;
+
+  &:hover {
+    color: #1a1a1a;
+  }
+
+  &.active {
+    color: #1a1a1a;
+    font-weight: 700;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 14px;
+      right: 14px;
+      height: 2px;
+      background-color: #1a1a1a;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+  }
+}
+
+// -------------------------------------------------------------------------
+// 2. Right Controls: Product Count & Sorting
+// -------------------------------------------------------------------------
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.productCount {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #76767c;
+}
+
+.sortWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sortLabel {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #76767c;
+}
+
+.sortSelect {
+  background-color: #ffffff;
+  border: 1px solid #e2e2e8;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: $font-sans;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #1a1a1a;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+  }
+}

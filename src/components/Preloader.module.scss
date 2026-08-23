@@ -1,0 +1,87 @@
+@use '../styles/variables' as *;
+
+// =========================================================================
+// PRELOADER — MINIMAL PULSE LOGO & PROGRESS-FILLING WAVE
+// =========================================================================
+
+.preloaderOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: all;
+  
+  &.fadeOut {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.preloaderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.brandLogo {
+  font-family: $font-sans;
+  font-size: clamp(2rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: #000000;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.waveContainer {
+  position: relative;
+  width: 200px;
+  height: 36px;
+}
+
+.waveSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// 0% Unfilled base wave line
+.waveBase {
+  stroke: #e5e5eb;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+// Filling black wave layer with dynamic clip path
+.waveFillLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: clip-path 0.15s ease-out;
+}
+
+.waveFill {
+  stroke: #000000;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
