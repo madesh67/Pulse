@@ -153,7 +153,10 @@ export const CartPageClient: React.FC = () => {
 
                     {/* Details */}
                     <div className={styles.itemDetails}>
-                      <span className={styles.itemCategory}>{item.categoryLabel}</span>
+                      <div className={styles.itemHeaderRow}>
+                        <span className={styles.itemCategory}>{item.categoryLabel}</span>
+                        <span className={styles.mobileLineTotal}>{formatCurrency(lineTotal)}</span>
+                      </div>
                       <Link href={`/shop/${item.slug}`} className={styles.itemName}>
                         {item.name}
                       </Link>

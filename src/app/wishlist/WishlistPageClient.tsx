@@ -223,7 +223,7 @@ export const WishlistPageClient: React.FC = () => {
             {/* Curated Recommendations */}
             <section className={styles.curatedSection}>
               <h3 className={styles.curatedHeading}>Signature Horological Pieces</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "24px" }}>
+              <div className={styles.curatedGrid}>
                 {recommendedProducts.map((p) => (
                   <ProductCard key={p.slug} product={p} />
                 ))}
