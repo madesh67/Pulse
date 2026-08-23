@@ -63,7 +63,7 @@ export const shopProducts: ShopProduct[] = [
     material: "Grade-5 Titanium",
     price: "$1,250",
     priceValue: 1250,
-    image: "/assets/offers/first-time-offer.png",
+    image: "/assets/products/aurora-chrono.jpg",
     imageAlt: "PULSE Aurora Chrono smartwatch with skeletonized mechanical dial",
     availability: "Limited Allocation",
     featured: true,

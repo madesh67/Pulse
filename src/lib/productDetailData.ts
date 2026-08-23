@@ -268,7 +268,7 @@ export const productDetailsMap: Record<string, ProductDetail> = {
     gallery: [
       {
         id: "hero",
-        src: "/assets/offers/first-time-offer.png",
+        src: "/assets/products/aurora-chrono.jpg",
         alt: "PULSE Aurora Chrono edition smartwatch with skeletonized dial face",
         label: "Dial View",
       },

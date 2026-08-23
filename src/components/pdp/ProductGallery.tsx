@@ -22,7 +22,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
 
   const currentImageSrc =
     activeImageOverride ||
-    (gallery && gallery.length > 0 ? gallery[0].src : "/assets/offers/first-time-offer.png");
+    (gallery && gallery.length > 0 ? gallery[0].src : "/assets/products/pulse-nova-pro.png");
   const currentImageAlt =
     (gallery && gallery.length > 0 ? gallery[0].alt : productName) || productName;
 
