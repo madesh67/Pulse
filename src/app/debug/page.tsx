@@ -13,7 +13,7 @@ export default function DebugPage() {
     progress,
     loadedCount,
     totalCount,
-    isTier1Loaded,
+    isFullyLoaded,
     isLoading,
     getFrameImage,
     getFrameBgColor,
@@ -81,23 +81,23 @@ export default function DebugPage() {
   else if (viewportShell === "mobile") shellClass = styles.shellMobile;
 
   // Retrieve current background color for seamless page-canvas blending
-  const currentBgColor = isTier1Loaded ? getFrameBgColor(currentFrame) : "#f7f7f7";
+  const currentBgColor = isFullyLoaded ? getFrameBgColor(currentFrame) : "#f7f7f7";
 
   return (
     <main
       className={styles.pageWrapper}
       style={{ backgroundColor: currentBgColor }}
     >
-      {/* Technical loader overlays until Tier 1 is fully loaded */}
+      {/* Technical loader overlays until frames are fully loaded */}
       <Preloader
         progress={progress}
         loadedCount={loadedCount}
         totalCount={totalCount}
-        isVisible={!isTier1Loaded}
+        isVisible={!isFullyLoaded}
       />
 
-      {/* Render Canvas & Debug Panel once Tier 1 is interactive */}
-      {isTier1Loaded && (
+      {/* Render Canvas & Debug Panel once fully loaded */}
+      {isFullyLoaded && (
         <>
           <div className={styles.viewportShellContainer}>
             <div className={shellClass}>

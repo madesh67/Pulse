@@ -21,11 +21,10 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// Optimal parallel concurrency for downloading & decoding WebP frames
+// Optimal parallel concurrency for fast parallel frame downloads
 const CONCURRENCY_LIMIT = 12;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
-  // Mobile devices are strictly phones (< 768px). Tablets (768px - 1024px) use desktop frames.
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   return {
     isMobile,
@@ -40,7 +39,7 @@ export function useFramePreloader() {
   const isMobileDevice = deviceConfig.isMobile;
   const totalFrames = activeManifest.totalFrames;
 
-  // Dynamically listen for window resize / shrink (e.g. tablet width shrinked to < 768px)
+  // Dynamically listen for window resize
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -69,7 +68,6 @@ export function useFramePreloader() {
 
   const [progress, setProgress] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
-  const [isTier1Loaded, setIsTier1Loaded] = useState(false);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -99,7 +97,7 @@ export function useFramePreloader() {
 
     pendingUpdateRef.current = { progress: calculatedProgress, loaded };
 
-    if (now - lastStateUpdateRef.current > 30 || loaded === targetTotal) {
+    if (now - lastStateUpdateRef.current > 20 || loaded === targetTotal) {
       lastStateUpdateRef.current = now;
       flushProgressUpdate();
     } else if (!animationFrameIdRef.current) {
@@ -182,38 +180,24 @@ export function useFramePreloader() {
           if (!isAborted) {
             setProgress(100);
             setLoadedCount(1);
-            setIsTier1Loaded(true);
             setIsFullyLoaded(true);
             setIsLoading(false);
           }
           return;
         }
 
-        // Tier 1: Priority Keyframes (Immediate Hero 0..12 + Every 4th Frame)
-        const tier1Set = new Set<number>();
-        for (let i = 0; i < Math.min(12, framesCount); i++) {
-          tier1Set.add(i);
-        }
-        for (let i = 12; i < framesCount; i += 4) {
-          tier1Set.add(i);
-        }
-        const tier1Queue = Array.from(tier1Set);
-
-        // Tier 2: Remaining in-between frames
-        const tier2Queue: number[] = [];
+        // Queue all frames in sequential order
+        const queue: number[] = [];
         for (let i = 0; i < framesCount; i++) {
-          if (!tier1Set.has(i)) {
-            tier2Queue.push(i);
-          }
+          queue.push(i);
         }
 
         let completedCount = 0;
 
-        // 1. Process Tier 1 Keyframes with high concurrency
-        const workerTier1 = async () => {
-          while (tier1Queue.length > 0) {
+        const worker = async () => {
+          while (queue.length > 0) {
             if (isAborted) return;
-            const idx = tier1Queue.shift();
+            const idx = queue.shift();
             if (idx === undefined) break;
             await loadFrame(idx);
             completedCount++;
@@ -221,39 +205,28 @@ export function useFramePreloader() {
           }
         };
 
-        await Promise.all(Array.from({ length: CONCURRENCY_LIMIT }, () => workerTier1()));
-
-        if (!isAborted) {
-          // Immediately unlock page rendering and user interactivity with keyframe interpolation
-          setIsTier1Loaded(true);
-          setIsLoading(false);
-        }
-
-        // 2. Process Tier 2 Remaining Frames in background
-        const workerTier2 = async () => {
-          while (tier2Queue.length > 0) {
-            if (isAborted) return;
-            const idx = tier2Queue.shift();
-            if (idx === undefined) break;
-            await loadFrame(idx);
-            completedCount++;
-            updateProgress(completedCount, framesCount);
-          }
-        };
-
-        await Promise.all(Array.from({ length: Math.min(6, CONCURRENCY_LIMIT) }, () => workerTier2()));
+        // Run download workers in parallel
+        const workers = Array.from({ length: CONCURRENCY_LIMIT }, () => worker());
+        await Promise.all(workers);
 
         if (!isAborted) {
           setProgress(100);
           setLoadedCount(framesCount);
           flushProgressUpdate();
-          setIsFullyLoaded(true);
+
+          // Smooth 250ms visual completion pause so user sees 100% complete wave
+          setTimeout(() => {
+            if (!isAborted) {
+              setIsFullyLoaded(true);
+              setIsLoading(false);
+            }
+          }, 250);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);
         if (!isAborted) {
           setIsError(true);
-          setIsTier1Loaded(true);
+          setIsFullyLoaded(true);
           setIsLoading(false);
         }
       }
@@ -314,7 +287,6 @@ export function useFramePreloader() {
     loadedCount,
     totalCount: totalFrames,
     isMobileDevice,
-    isTier1Loaded,
     isFullyLoaded,
     isLoading,
     isError,

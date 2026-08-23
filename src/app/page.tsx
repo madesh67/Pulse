@@ -16,7 +16,7 @@ export default function Home() {
   const {
     progress,
     totalCount,
-    isTier1Loaded,
+    isFullyLoaded,
     getFrameImage,
     getFrameBgColor,
   } = useFramePreloader();
@@ -43,9 +43,9 @@ export default function Home() {
       style={{ backgroundColor: fixedBgColor, overflow: "visible", height: "auto" }}
     >
       {/* Minimal PULSE logo with progress-filling wave */}
-      <Preloader isVisible={!isTier1Loaded} progress={progress} />
+      <Preloader isVisible={!isFullyLoaded} progress={progress} />
 
-      {isTier1Loaded && (
+      {isFullyLoaded && (
         <SmoothScrollProvider>
           {/* Production Navigation Bar */}
           <Navigation />
