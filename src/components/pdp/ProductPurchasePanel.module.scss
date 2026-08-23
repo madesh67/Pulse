@@ -4,51 +4,61 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-left: 12px;
+  padding-left: 8px;
+
+  @media (max-width: 900px) {
+    padding-left: 0;
+  }
 }
 
 .metaRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
 .categoryBadgeGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .categoryBadge {
   font-family: $font-sans;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: $color-text-light;
-  font-weight: $fw-semibold;
+  color: #76767c;
+  font-weight: 700;
+  background: #f4f4f7;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 .materialBadge {
   font-family: $font-sans;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  background: #f4f4f7;
-  color: $color-text-muted;
-  padding: 2px 8px;
-  border-radius: 2px;
-  border: 1px solid #e2e2e6;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  background: #f8f8fa;
+  color: #55555a;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #e5e5ea;
 }
 
 .newBadge {
   font-family: $font-sans;
   font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  background: #1a1a1a;
+  letter-spacing: 0.12em;
+  background: #000000;
   color: #ffffff;
-  padding: 2px 7px;
-  border-radius: 2px;
-  font-weight: $fw-medium;
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-weight: 700;
 }
 
 .availabilityBadge {
@@ -58,7 +68,7 @@
   font-family: $font-sans;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
-  font-weight: $fw-medium;
+  font-weight: 600;
 
   .statusDot {
     width: 6px;
@@ -83,19 +93,19 @@
 
 .productName {
   font-family: $font-sans;
-  font-size: 2.3rem;
-  font-weight: $fw-light;
-  letter-spacing: -0.01em;
-  color: $color-text-main;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #111111;
   line-height: 1.15;
   margin: 0 0 10px 0;
 }
 
 .descriptor {
   font-family: $font-sans;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: $color-text-muted;
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  line-height: 1.6;
+  color: #55555a;
   margin: 0 0 20px 0;
 }
 
@@ -112,17 +122,17 @@
 }
 
 .priceValue {
-  font-family: $font-sans;
-  font-size: 1.85rem;
-  font-weight: $fw-medium;
-  letter-spacing: -0.02em;
-  color: $color-text-main;
+  font-family: $font-serif;
+  font-size: clamp(1.65rem, 3.5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #111111;
 }
 
 .taxNotice {
   font-family: $font-sans;
-  font-size: 0.76rem;
-  color: $color-text-light;
+  font-size: 0.75rem;
+  color: #888892;
 }
 
 .divider {
@@ -156,17 +166,18 @@
 
 .groupTitle {
   font-family: $font-sans;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: $fw-semibold;
-  color: $color-text-main;
+  font-weight: 700;
+  color: #111111;
 }
 
 .selectedLabel {
   font-family: $font-sans;
-  font-size: 0.78rem;
-  color: $color-text-muted;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #76767c;
 }
 
 .optionList {
@@ -180,36 +191,42 @@
   align-items: center;
   gap: 8px;
   background: #ffffff;
-  border: 1px solid #dcdee2;
-  border-radius: 4px;
+  border: 1px solid #dcdce4;
+  border-radius: 8px;
   padding: 10px 16px;
   font-family: $font-sans;
   font-size: 0.82rem;
-  font-weight: $fw-regular;
-  color: $color-text-main;
+  font-weight: 500;
+  color: #1a1a1a;
   cursor: pointer;
-  transition: $transition-fast;
+  min-height: 44px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 
   &:hover {
-    border-color: #9999a0;
+    border-color: #000000;
     background: #fafafc;
   }
 
   &:focus-visible {
-    border-color: $color-text-main;
-    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.2);
+    border-color: #000000;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+    font-size: 0.78rem;
   }
 }
 
 .activeOption {
-  border-color: $color-text-main;
-  background: #1a1a1a;
+  border-color: #000000;
+  background: #000000;
   color: #ffffff;
 
   &:hover {
-    background: #000000;
-    border-color: #000000;
+    background: #1a1a1a;
+    border-color: #1a1a1a;
   }
 
   .priceDelta {
@@ -218,8 +235,8 @@
 }
 
 .colorSwatch {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.15);
   display: inline-block;
@@ -231,15 +248,15 @@
 }
 
 .priceDelta {
-  font-size: 0.74rem;
-  color: $color-text-light;
+  font-size: 0.72rem;
+  color: #76767c;
   margin-left: 2px;
 }
 
 .actionContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 32px;
 }
 
@@ -247,32 +264,57 @@
   display: flex;
   gap: 10px;
   align-items: center;
+
+  @media (max-width: 540px) {
+    display: grid;
+    grid-template-columns: 1fr 48px;
+    grid-template-rows: auto auto;
+    gap: 10px;
+
+    .secondaryCta {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .pdpWishlistBtn {
+      grid-column: 2;
+      grid-row: 1;
+      width: 48px;
+      height: 48px;
+    }
+
+    .primaryCta {
+      grid-column: 1 / span 2;
+      grid-row: 2;
+    }
+  }
 }
 
 .primaryCta {
-  flex: 1;
-  background: $color-accent;
+  flex: 1.1;
+  background: #000000;
   color: #ffffff;
   border: none;
-  border-radius: 4px;
-  padding: 16px 20px;
+  border-radius: 100px;
+  padding: 15px 22px;
   font-family: $font-sans;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   letter-spacing: 0.14em;
-  font-weight: $fw-semibold;
+  font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: $transition-normal;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-height: 48px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 
   &:hover {
-    background: $color-accent-hover;
+    background: #222226;
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 
     .ctaArrow {
       transform: translateX(4px);
@@ -281,37 +323,36 @@
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   &:focus-visible {
-    outline: 2px solid $color-accent;
-    outline-offset: 4px;
+    outline: 2px solid #000000;
+    outline-offset: 3px;
   }
 }
 
 .secondaryCta {
   flex: 1;
   background: #ffffff;
-  color: #1a1a1a;
-  border: 1.5px solid #1a1a1a;
-  border-radius: 4px;
-  padding: 16px 20px;
+  color: #111111;
+  border: 1.5px solid #111111;
+  border-radius: 100px;
+  padding: 15px 22px;
   font-family: $font-sans;
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-  font-weight: $fw-semibold;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: $transition-fast;
+  min-height: 48px;
+  transition: all 0.2s ease;
 
   &:hover {
-    background: #1a1a1a;
-    color: #ffffff;
+    background: #f7f7fa;
     transform: translateY(-2px);
   }
 
@@ -320,18 +361,18 @@
   }
 
   &.addedSuccess {
-    background: #2e7d32;
+    background: #1b5e20;
     color: #ffffff;
-    border-color: #2e7d32;
+    border-color: #1b5e20;
   }
 }
 
 .pdpWishlistBtn {
-  width: 52px;
-  height: 52px;
-  border-radius: 4px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: #ffffff;
-  border: 1px solid #dcdee2;
+  border: 1px solid #dcdce4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,9 +387,9 @@
   }
 
   &:hover {
-    border-color: #1a1a1a;
+    border-color: #000000;
     color: #e53935;
-    transform: translateY(-2px);
+    transform: scale(1.06);
   }
 
   &.inWishlist {
@@ -363,15 +404,15 @@
 }
 
 .ctaArrow {
-  font-size: 1.1rem;
-  transition: transform 0.25s ease;
+  font-size: 1.05rem;
+  transition: transform 0.2s ease;
 }
 
 .actionNote {
   font-family: $font-sans;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   line-height: 1.45;
-  color: $color-text-light;
+  color: #76767c;
   text-align: center;
   margin: 0;
 }
@@ -391,9 +432,9 @@
 }
 
 .serviceIcon {
-  width: 20px;
-  height: 20px;
-  color: $color-text-main;
+  width: 18px;
+  height: 18px;
+  color: #111111;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -405,28 +446,14 @@
   font-family: $font-sans;
 
   strong {
-    font-size: 0.82rem;
-    font-weight: $fw-medium;
-    color: $color-text-main;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #111111;
   }
 
   span {
-    font-size: 0.76rem;
-    color: $color-text-light;
+    font-size: 0.74rem;
+    color: #76767c;
     line-height: 1.35;
-  }
-}
-
-@media (max-width: 900px) {
-  .panelWrapper {
-    padding-left: 0;
-  }
-
-  .productName {
-    font-size: 1.95rem;
-  }
-
-  .priceValue {
-    font-size: 1.6rem;
   }
 }

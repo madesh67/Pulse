@@ -3,15 +3,28 @@
 .breadcrumbNav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 10px;
   font-family: $font-sans;
-  font-size: 0.76rem;
-  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: $color-text-light;
   margin-bottom: 24px;
-  padding-top: 8px;
+  padding-top: 4px;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
 }
 
 .backLink {
@@ -19,9 +32,10 @@
   align-items: center;
   gap: 6px;
   color: $color-text-main;
-  font-weight: $fw-medium;
+  font-weight: $fw-semibold;
   text-decoration: none;
   transition: $transition-fast;
+  flex-shrink: 0;
 
   &:hover {
     color: #000000;
@@ -32,9 +46,8 @@
   }
 
   &:focus-visible {
-    outline: 2px solid $color-accent;
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline: 2px solid #000000;
+    outline-offset: 2px;
   }
 }
 
@@ -44,12 +57,14 @@
 }
 
 .separator {
-  color: #c4c4c8;
+  color: #d1d1d8;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .categoryLabel {
   color: $color-text-muted;
+  flex-shrink: 0;
 }
 
 .activeProduct {
@@ -57,17 +72,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 260px;
-}
+  max-width: 280px;
 
-@media (max-width: 768px) {
-  .breadcrumbNav {
-    font-size: 0.72rem;
-    gap: 8px;
-    margin-bottom: 18px;
-  }
-
-  .activeProduct {
-    max-width: 180px;
+  @media (max-width: 768px) {
+    max-width: 160px;
   }
 }

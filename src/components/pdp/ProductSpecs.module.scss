@@ -92,21 +92,28 @@
   }
 
   .sectionTitle {
-    font-size: 1.8rem;
+    font-size: clamp(1.65rem, 5vw, 2rem);
   }
 
   .specsGrid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 28px;
   }
 
   .specRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .specLabel {
+    font-size: 0.8rem;
   }
 
   .specValue {
-    text-align: left;
+    font-size: 0.84rem;
+    text-align: right;
   }
 }

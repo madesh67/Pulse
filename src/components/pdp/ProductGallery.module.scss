@@ -13,18 +13,35 @@
 .mainImageContainer {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 11;
-  background: #fbfbfb;
-  border: 1px solid #ededf0;
-  border-radius: 8px;
+  aspect-ratio: 16 / 12;
+  background: #ffffff;
+  border: 1px solid #ededf2;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: crosshair;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: #dcdce4;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  }
 
   &.zoomed .mainImage {
     transform: scale(1.65);
+  }
+
+  @media (max-width: 900px) {
+    aspect-ratio: 16 / 13;
+    cursor: default;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 600px) {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
   }
 }
 
@@ -32,25 +49,35 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 24px;
+  padding: 32px;
   transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1);
   will-change: transform;
+
+  @media (max-width: 900px) {
+    padding: 24px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
 }
 
 .zoomHint {
   position: absolute;
-  bottom: 14px;
-  right: 14px;
+  bottom: 16px;
+  right: 16px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(220, 220, 225, 0.8);
-  border-radius: 20px;
-  padding: 5px 12px;
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(220, 220, 225, 0.9);
+  border-radius: 100px;
+  padding: 6px 14px;
   font-family: $font-sans;
   font-size: 0.68rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: $color-text-muted;
@@ -58,29 +85,17 @@
   transition: opacity 0.2s ease;
 
   .zoomIcon {
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
+  }
+
+  @media (max-width: 900px) {
+    display: none;
   }
 }
 
 .mainImageContainer:hover .zoomHint {
   opacity: 0;
-}
-
-@media (max-width: 900px) {
-  .zoomHint {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .mainImageContainer {
-    aspect-ratio: 4 / 3;
-  }
-
-  .mainImage {
-    padding: 16px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -167,15 +167,30 @@
 
 @media (max-width: 768px) {
   .relatedSection {
-    padding: 50px 0 30px 0;
+    padding: 48px 0 28px 0;
   }
 
   .sectionTitle {
-    font-size: 1.9rem;
+    font-size: clamp(1.65rem, 5vw, 2rem);
   }
 
   .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .contentSection {
+    padding: 16px 14px;
+  }
+
+  .productName {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .productGrid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
   }
 }

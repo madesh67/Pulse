@@ -9,49 +9,50 @@
 }
 
 .contentBoundary {
-  max-width: $layout-content-width;
+  max-width: 1380px;
   margin: 0 auto;
-  padding: calc(#{$layout-header-height} + 24px) 24px 60px 24px;
+  padding: calc(#{$layout-header-height} + 28px) 48px 80px 48px;
   width: 100%;
   box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    padding: calc(#{$layout-header-height} + 20px) 32px 60px 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: calc(#{$layout-header-height} + 12px) 16px 48px 16px;
+  }
 }
 
 .topSection {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 48px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 56px;
   align-items: flex-start;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 32px;
+  }
 }
 
 .galleryColumn {
   width: 100%;
   position: sticky;
   top: calc(#{$layout-header-height} + 16px);
+
+  @media (max-width: 900px) {
+    position: static;
+  }
 }
 
 .purchaseColumn {
   width: 100%;
-}
-
-@media (max-width: 1024px) {
-  .topSection {
-    grid-template-columns: 1fr 1fr;
-    gap: 36px;
-  }
-}
-
-@media (max-width: 900px) {
-  .contentBoundary {
-    padding: calc(#{$layout-header-height} + 12px) 16px 40px 16px;
-  }
-
-  .topSection {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .galleryColumn {
-    position: static;
-  }
 }
