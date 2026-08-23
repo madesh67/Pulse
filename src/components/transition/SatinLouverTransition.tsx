@@ -40,7 +40,7 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
     if (status === "idle") {
       gsap.set(container, { autoAlpha: 0 });
       gsap.set(cols, { scaleY: 0 });
-      gsap.set(emblem, { autoAlpha: 0, scale: 0.94 });
+      gsap.set(emblem, { autoAlpha: 0, scale: 0.92 });
       return;
     }
 
@@ -54,7 +54,7 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
             onCoverComplete?.();
           },
         });
-        tl.to(cols, { opacity: 1, duration: 0.2, ease: "power1.inOut" });
+        tl.to(cols, { opacity: 1, duration: 0.15, ease: "power1.inOut" });
         tl.to(emblem, { autoAlpha: 1, duration: 0.15 }, 0.05);
         tlRef.current = tl;
         return;
@@ -72,17 +72,17 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
 
       tl.to(cols, {
         scaleY: 1,
-        duration: 0.36,
-        stagger: 0.04,
-        ease: "power3.inOut",
+        duration: 0.42,
+        stagger: 0.05,
+        ease: "power4.inOut",
       });
 
-      // Emblem gently fades in
+      // Emblem gently fades and scales in at apex
       tl.fromTo(
         emblem,
-        { autoAlpha: 0, scale: 0.92 },
-        { autoAlpha: 1, scale: 1, duration: 0.25, ease: "power2.out" },
-        "-=0.18"
+        { autoAlpha: 0, scale: 0.88, y: 16 },
+        { autoAlpha: 1, scale: 1, y: 0, duration: 0.28, ease: "power3.out" },
+        "-=0.2"
       );
 
       tlRef.current = tl;
@@ -97,7 +97,7 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
           },
         });
         tl.to(emblem, { autoAlpha: 0, duration: 0.15 });
-        tl.to(cols, { opacity: 0, duration: 0.2, ease: "power1.inOut" }, 0.05);
+        tl.to(cols, { opacity: 0, duration: 0.15, ease: "power1.inOut" }, 0.05);
         tlRef.current = tl;
         return;
       }
@@ -114,8 +114,9 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
       // Emblem fades out first
       tl.to(emblem, {
         autoAlpha: 0,
-        scale: 0.96,
-        duration: 0.18,
+        scale: 0.95,
+        y: -10,
+        duration: 0.2,
         ease: "power2.in",
       });
 
@@ -126,11 +127,11 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
         cols,
         {
           scaleY: 0,
-          duration: 0.4,
-          stagger: 0.04,
-          ease: "power3.inOut",
+          duration: 0.45,
+          stagger: 0.05,
+          ease: "power4.inOut",
         },
-        "-=0.08"
+        "-=0.1"
       );
 
       tlRef.current = tl;
@@ -166,8 +167,8 @@ export const SatinLouverTransition: React.FC<SatinLouverTransitionProps> = ({
       <div ref={emblemRef} className={styles.emblemContainer}>
         <div className={styles.emblemAperture}>
           <svg className={styles.apertureSvg} viewBox="0 0 80 80" fill="none">
-            <circle cx="40" cy="40" r="36" stroke="rgba(197, 168, 128, 0.4)" strokeWidth="1" />
-            <circle cx="40" cy="40" r="30" stroke="rgba(26, 26, 26, 0.15)" strokeWidth="0.75" strokeDasharray="2 3" />
+            <circle cx="40" cy="40" r="36" stroke="rgba(197, 168, 128, 0.5)" strokeWidth="1.2" />
+            <circle cx="40" cy="40" r="30" stroke="rgba(26, 26, 26, 0.2)" strokeWidth="0.75" strokeDasharray="2 3" />
             {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
               <line
                 key={deg}

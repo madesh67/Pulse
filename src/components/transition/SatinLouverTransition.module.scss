@@ -35,17 +35,36 @@
 .louverColumn {
   width: 100%;
   height: 100%;
+  position: relative;
   background: linear-gradient(
     180deg,
     #ffffff 0%,
-    #fafafa 50%,
-    #f5f5f7 100%
+    #fcfcfd 30%,
+    #f7f7fa 70%,
+    #f0f0f4 100%
   );
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.03);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   transform: scaleY(0);
   transform-origin: top center;
   will-change: transform;
+
+  // Leading gold hairline edge on each slat
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      rgba(197, 168, 128, 0.4) 0%,
+      #c5a880 50%,
+      rgba(197, 168, 128, 0.4) 100%
+    );
+    box-shadow: 0 0 12px rgba(197, 168, 128, 0.8);
+  }
 
   &:last-child {
     border-right: none;
@@ -61,15 +80,21 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: 32px 48px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(197, 168, 128, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 0 30px rgba(197, 168, 128, 0.15);
+  backdrop-filter: blur(16px);
   opacity: 0;
-  transform: scale(0.94);
+  transform: scale(0.92);
   will-change: opacity, transform;
 }
 
 .emblemAperture {
-  width: 84px;
-  height: 84px;
-  margin-bottom: 20px;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 16px;
   position: relative;
   display: flex;
   align-items: center;
@@ -79,18 +104,18 @@
     width: 100%;
     height: 100%;
     transform-origin: center;
-    animation: rotateAperture 10s linear infinite;
+    animation: rotateAperture 8s linear infinite;
   }
 
   .apertureHand {
     position: absolute;
-    width: 1.5px;
-    height: 30px;
+    width: 2px;
+    height: 28px;
     background: linear-gradient(to top, transparent, #c5a880);
     transform-origin: bottom center;
     bottom: 50%;
-    left: calc(50% - 0.75px);
-    animation: sweepHand 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    left: calc(50% - 1px);
+    animation: sweepHand 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   .apertureDot {
@@ -99,14 +124,14 @@
     height: 6px;
     border-radius: 50%;
     background-color: #c5a880;
-    box-shadow: 0 0 8px rgba(197, 168, 128, 0.8);
+    box-shadow: 0 0 8px rgba(197, 168, 128, 0.9);
   }
 }
 
 .brandWordmark {
   font-family: $font-sans;
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.35rem;
+  font-weight: 600;
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: #1a1a1a;
@@ -115,7 +140,7 @@
 
 .brandSubtext {
   font-family: $font-sans;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.28em;
   text-transform: uppercase;

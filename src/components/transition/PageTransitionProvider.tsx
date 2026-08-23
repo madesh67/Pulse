@@ -143,14 +143,13 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     }
   }, []);
 
-  // Global link click interceptor (bubbling phase)
+  // Global link click interceptor (capture phase to intercept before Next.js Link)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const handleDocumentClick = (event: MouseEvent) => {
       // Ignore modified clicks (open in new tab / window)
       if (
-        event.defaultPrevented ||
         event.button !== 0 ||
         event.metaKey ||
         event.ctrlKey ||
@@ -190,20 +189,27 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
         }
 
         // Ignore same path and same query
-        if (url.pathname === window.location.pathname && url.search === window.location.search) {
+        if (url.pathname === window.location.pathname && url.search === window.location.search && !url.hash) {
+          return;
+        }
+
+        // Ignore hash on current page
+        if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
           return;
         }
 
         event.preventDefault();
+        event.stopPropagation();
         navigateTo(url.pathname + url.search + url.hash);
       } catch {
         // Fallback to default browser handling
       }
     };
 
-    document.addEventListener("click", handleDocumentClick, false);
+    // Use capture phase so we intercept before Next.js Link's internal onClick preventDefault
+    document.addEventListener("click", handleDocumentClick, true);
     return () => {
-      document.removeEventListener("click", handleDocumentClick, false);
+      document.removeEventListener("click", handleDocumentClick, true);
     };
   }, [navigateTo]);
 
