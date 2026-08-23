@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Outfit, Cormorant_Garamond } from "next/font/google";
 import { PageTransitionProvider } from "../components/transition/PageTransitionProvider";
+import { CartProvider, WishlistProvider, AccountProvider } from "../context";
 import "../styles/global.scss";
 
 const outfit = Outfit({
@@ -41,11 +42,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${cormorant.variable}`}>
       <body>
-        <Suspense fallback={<div style={{ minHeight: "100vh", backgroundColor: "#ffffff" }} />}>
-          <PageTransitionProvider>{children}</PageTransitionProvider>
-        </Suspense>
+        <CartProvider>
+          <WishlistProvider>
+            <AccountProvider>
+              <Suspense fallback={<div style={{ minHeight: "100vh", backgroundColor: "#ffffff" }} />}>
+                <PageTransitionProvider>{children}</PageTransitionProvider>
+              </Suspense>
+            </AccountProvider>
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   );
 }
-

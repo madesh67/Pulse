@@ -1,0 +1,463 @@
+@use '../../styles/variables' as *;
+
+.wishlistPage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #ffffff;
+  color: $color-text-main;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContainer {
+  flex: 1;
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 120px $spacing-lg 80px;
+
+  @media (max-width: 1024px) {
+    padding: 100px $spacing-md 60px;
+  }
+
+  @media (max-width: 767px) {
+    padding: 90px $spacing-sm 48px;
+  }
+}
+
+// Header & Breadcrumb
+.pageHeader {
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 24px;
+
+  @media (max-width: 767px) {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  margin-bottom: 12px;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-text-main;
+    }
+  }
+
+  .separator {
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  .current {
+    color: $color-text-main;
+    font-weight: 600;
+  }
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.pageTitle {
+  font-family: $font-sans;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #111111;
+  margin: 0;
+}
+
+.itemCountBadge {
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #76767c;
+  font-weight: 500;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .headerActionBtn {
+    background: #fafafa;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #111111;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #111111;
+      color: #ffffff;
+      border-color: #111111;
+    }
+
+    &.primaryAction {
+      background: #111111;
+      color: #ffffff;
+
+      &:hover {
+        background: #c5a880;
+        color: #000000;
+      }
+    }
+  }
+}
+
+// Wishlist Grid
+.wishlistGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+
+  @media (max-width: 1080px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.wishlistCard {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.14);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    transform: translateY(-3px);
+  }
+}
+
+.cardImageWrapper {
+  width: 100%;
+  height: 240px;
+  background: #fbfbfb;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+
+  .cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover .cardImage {
+    transform: scale(1.06);
+  }
+
+  @media (max-width: 767px) {
+    height: 200px;
+  }
+}
+
+.removeWishlistBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #76767c;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: #d32f2f;
+    color: #ffffff;
+    border-color: #d32f2f;
+    transform: scale(1.08);
+  }
+}
+
+.cardBadgeGroup {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+
+.categoryTag {
+  font-family: $font-sans;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: #111111;
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.cardBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  @media (max-width: 767px) {
+    padding: 18px 16px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.productNameLink {
+  font-family: $font-sans;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111111;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #c5a880;
+  }
+}
+
+.productPrice {
+  font-family: $font-sans;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111111;
+}
+
+.productDescriptor {
+  font-family: $font-sans;
+  font-size: 0.82rem;
+  color: #666666;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 16px;
+}
+
+.materialLabel {
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #888888;
+}
+
+.addToBagBtn {
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #c5a880;
+    color: #000000;
+  }
+
+  &.addedSuccess {
+    background: #2e7d32;
+    color: #ffffff;
+  }
+}
+
+// Notification Toast
+.toastNotification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #111111;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  animation: slideToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .toastLink {
+    color: #c5a880;
+    font-weight: 600;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+}
+
+@keyframes slideToast {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Empty State
+.emptyStateContainer {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.emptyIconCircle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: #c5a880;
+
+  svg {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.emptyTitle {
+  font-family: $font-sans;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #111111;
+  margin: 0 0 12px;
+}
+
+.emptySubtitle {
+  font-family: $font-sans;
+  font-size: 0.95rem;
+  color: #76767c;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.emptyCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #111111;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: 30px;
+  font-family: $font-sans;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #c5a880;
+    color: #000000;
+    transform: translateY(-2px);
+  }
+}
+
+// Curated Highlights
+.curatedSection {
+  margin-top: 80px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 48px;
+}
+
+.curatedHeading {
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #111111;
+  text-align: center;
+  margin-bottom: 32px;
+}

@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ProductDetail, ProductVariantGroup } from "../../lib/productDetailData";
+import { useCart, useWishlist } from "../../context";
+import { shopProducts, ShopProduct } from "../../lib/shopProductsData";
 import styles from "./ProductPurchasePanel.module.scss";
 
 interface ProductPurchasePanelProps {
@@ -20,6 +22,7 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
   onReserveClick,
 }) => {
   const {
+    slug,
     name,
     categoryLabel,
     descriptor,
@@ -28,6 +31,12 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
     isNew,
     variantGroups,
   } = product;
+
+  const { addItem } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const isWishlisted = isInWishlist(slug);
+  const [isBagAdded, setIsBagAdded] = useState(false);
 
   const isLimited = availability.toLowerCase().includes("limited");
   const isTimepiece = product.category === "smartwatches" || product.category === "editions";
@@ -38,6 +47,60 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
       currency: "USD",
       maximumFractionDigits: 0,
     }).format(val);
+  };
+
+  // Build summary of chosen variants
+  const getVariantSummary = () => {
+    if (!variantGroups || variantGroups.length === 0) return material;
+    const parts: string[] = [];
+    variantGroups.forEach((group) => {
+      const selectedId = selectedVariants[group.id] || group.defaultOptionId;
+      const opt = group.options.find((o) => o.id === selectedId);
+      if (opt) parts.push(opt.label);
+    });
+    return parts.join(" • ") || material;
+  };
+
+  const handleAddToBag = () => {
+    const mainImage = product.gallery && product.gallery.length > 0 ? product.gallery[0].src : "/assets/products/pulse-nova-pro.png";
+
+    addItem({
+      slug,
+      name,
+      price: calculatedPrice,
+      image: mainImage,
+      material,
+      categoryLabel,
+      selectedVariants,
+      variantSummary: getVariantSummary(),
+      quantity: 1,
+      availability,
+    });
+
+    setIsBagAdded(true);
+    setTimeout(() => {
+      setIsBagAdded(false);
+    }, 2500);
+  };
+
+  const handleWishlistToggle = () => {
+    const matchedShopProduct: ShopProduct = shopProducts.find((p) => p.slug === slug) || {
+      id: product.id || slug,
+      slug,
+      name,
+      category: product.category,
+      categoryLabel,
+      descriptor,
+      material,
+      price: formatCurrency(calculatedPrice),
+      priceValue: calculatedPrice,
+      image: product.gallery && product.gallery.length > 0 ? product.gallery[0].src : "/assets/products/pulse-nova-pro.png",
+      imageAlt: name,
+      availability,
+      featured: false,
+      isNew: !!isNew,
+    };
+    toggleWishlist(matchedShopProduct);
   };
 
   return (
@@ -101,10 +164,13 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
                       <button
                         key={opt.id}
                         type="button"
+                        className={`${styles.optionBtn} ${
+                          isSelected ? styles.activeOption : ""
+                        }`}
+                        onClick={() => onVariantChange(group.id, opt.id)}
                         role="radio"
                         aria-checked={isSelected}
-                        className={`${styles.optionBtn} ${isSelected ? styles.activeOption : ""}`}
-                        onClick={() => onVariantChange(group.id, opt.id)}
+                        aria-label={`${opt.label} ${opt.priceDelta ? `(${formatCurrency(opt.priceDelta)})` : ""}`}
                       >
                         {hasColor && (
                           <span
@@ -114,9 +180,11 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
                           />
                         )}
                         <span className={styles.optionText}>{opt.label}</span>
-                        {opt.priceDelta && opt.priceDelta > 0 ? (
-                          <span className={styles.priceDelta}>+{formatCurrency(opt.priceDelta)}</span>
-                        ) : null}
+                        {opt.priceDelta && opt.priceDelta > 0 && (
+                          <span className={styles.priceDelta}>
+                            (+{formatCurrency(opt.priceDelta)})
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -127,20 +195,53 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
         </div>
       )}
 
-      {/* 5. Primary Purchase / Reservation Action */}
+      {/* 5. Primary Purchase & Action Buttons */}
       <div className={styles.actionContainer}>
-        <button
-          type="button"
-          className={styles.primaryCta}
-          onClick={onReserveClick}
-          id="primary-purchase-cta"
-          aria-label={`${isTimepiece ? "Reserve" : "Add to Bag"} ${name} for ${formatCurrency(calculatedPrice)}`}
-        >
-          <span>{isTimepiece ? "RESERVE TIMEPIECE" : "ADD TO ATELIER BAG"}</span>
-          <span className={styles.ctaArrow} aria-hidden="true">
-            &rarr;
-          </span>
-        </button>
+        <div className={styles.buttonRow}>
+          {/* Add to Bag Button */}
+          <button
+            type="button"
+            className={`${styles.secondaryCta} ${isBagAdded ? styles.addedSuccess : ""}`}
+            onClick={handleAddToBag}
+            aria-label={`Add ${name} to Shopping Bag`}
+          >
+            <span>{isBagAdded ? "Added to Bag ✓" : "Add to Bag"}</span>
+          </button>
+
+          {/* Primary Action Button (Reservation / Direct Acquisition) */}
+          <button
+            type="button"
+            className={styles.primaryCta}
+            onClick={onReserveClick}
+            id="primary-purchase-cta"
+            aria-label={`${isTimepiece ? "Reserve" : "Direct Acquisition"} ${name}`}
+          >
+            <span>{isTimepiece ? "Reserve" : "Acquire"}</span>
+            <span className={styles.ctaArrow} aria-hidden="true">
+              &rarr;
+            </span>
+          </button>
+
+          {/* Wishlist Heart Button */}
+          <button
+            type="button"
+            className={`${styles.pdpWishlistBtn} ${isWishlisted ? styles.inWishlist : ""}`}
+            onClick={handleWishlistToggle}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            title={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
+        </div>
 
         <p className={styles.actionNote}>
           {isTimepiece
@@ -163,7 +264,7 @@ export const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
             aria-hidden="true"
           >
             <rect x="1" y="3" width="15" height="13" />
-            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+            <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
             <circle cx="5.5" cy="18.5" r="2.5" />
             <circle cx="18.5" cy="18.5" r="2.5" />
           </svg>

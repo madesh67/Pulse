@@ -6,6 +6,7 @@ import Link from "next/link";
 import { heroContent } from "../lib/heroContent";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useCart, useWishlist } from "../context";
 import styles from "./Navigation.module.scss";
 
 // Register ScrollTrigger plugin safely
@@ -88,7 +89,8 @@ const NavigationLinksFallback: React.FC<{
 export const Navigation: React.FC = () => {
   const { logo, product, links } = heroContent.navigation;
   const pathname = usePathname();
-  const [cartCount] = useState(0);
+  const { totalCount: cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -197,9 +199,9 @@ export const Navigation: React.FC = () => {
         <div className={styles.actionsGroup} aria-label="User Actions">
           {/* Wishlist Button */}
           <Link
-            href="/shop"
+            href="/wishlist"
             className={styles.actionButton}
-            aria-label="Wishlist"
+            aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items saved` : "Wishlist"}
             title="Wishlist"
           >
             <svg
@@ -213,14 +215,19 @@ export const Navigation: React.FC = () => {
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
+            {wishlistCount > 0 && (
+              <span className={styles.wishlistBadge} aria-label={`${wishlistCount} items in wishlist`}>
+                {wishlistCount}
+              </span>
+            )}
           </Link>
 
           {/* Shopping Cart Button */}
           <Link
-            href="/shop"
+            href="/cart"
             className={styles.actionButton}
-            aria-label={cartCount > 0 ? `Shopping Cart, ${cartCount} items` : "Shopping Cart"}
-            title="Cart"
+            aria-label={cartCount > 0 ? `Shopping Bag, ${cartCount} items` : "Shopping Bag"}
+            title="Shopping Bag"
           >
             <svg
               className={styles.actionIcon}
@@ -244,10 +251,10 @@ export const Navigation: React.FC = () => {
 
           {/* Account Button (Desktop & Tablet) */}
           <Link
-            href="/shop"
+            href="/account"
             className={`${styles.actionButton} ${styles.accountDesktopBtn}`}
-            aria-label="My Account"
-            title="Account"
+            aria-label="My Atelier Account"
+            title="My Account"
           >
             <svg
               className={styles.actionIcon}
@@ -361,17 +368,17 @@ export const Navigation: React.FC = () => {
           <div className={styles.drawerFooter}>
             <div className={styles.drawerActions}>
               <Link
-                href="/shop"
+                href="/wishlist"
                 className={styles.drawerActionBtn}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
-                <span>Wishlist</span>
+                <span>Wishlist {wishlistCount > 0 ? `(${wishlistCount})` : ""}</span>
               </Link>
               <Link
-                href="/shop"
+                href="/account"
                 className={styles.drawerActionBtn}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -380,6 +387,18 @@ export const Navigation: React.FC = () => {
                   <circle cx="12" cy="7" r="4" />
                 </svg>
                 <span>Account</span>
+              </Link>
+              <Link
+                href="/cart"
+                className={styles.drawerActionBtn}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <span>Bag {cartCount > 0 ? `(${cartCount})` : ""}</span>
               </Link>
             </div>
             <Link
