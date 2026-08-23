@@ -2,5 +2,11 @@
   width: 100%;
   min-height: 100%;
   position: relative;
-  will-change: transform, opacity;
+  will-change: opacity, transform, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pageEnterWrapper {
+    will-change: auto;
+  }
 }

@@ -1101,26 +1101,19 @@ Strictly utilizes real project categories and dedicated studio assets:
 
 ---
 
-## 29. Phase 29 — Horological Chronometer Page Transition System (Status: Completed)
+## 29. Phase 29 — Minimalist Kinematic Page Transition System (Status: Completed)
 
-### 1. Horological Conceptual Design
-* **Design Philosophy:** Transitions are treated not as generic web cuts or flashy spins, but as calibrated horological aperture sweeps inspired by high-complication Swiss chronometry and titanium iris shutters.
-* **Curtain Architecture:**
-  * **Obsidian Titanium Plate (`#0e0e10`):** Radial-brushed deep titanium plate sweeping across the screen using GSAP `power4.inOut`.
-  * **Horizon Gold Hairline (`#c5a880`):** 2px leading-edge precision scan line with radiant golden ambient glow.
-  * **Mechanical Caliber Calibration HUD:**
-    * 12-hour SVG index ring with continuous rotating escapement hand.
-    * `PULSE • CHRONOMETRY` brand mark.
-    * Dynamic route caliber badge (e.g. `CALIBER 00 • FLAGSHIP SHOWCASE`, `CALIBER 01 • MAISON ATELIER`, `CALIBER 02 • ATELIER CATALOGUE`, `CALIBER 03 • [NAME] CHRONOMETER`).
-    * Calibrated precision coordinates: `GENÈVE • 46°12'N 6°09'E • 0.01ms SYNC`.
-
-### 2. Architecture & Performance
-* [`src/components/transition/ChronometerCurtain.tsx`](file:///C:/Users/srima/OneDrive/Documents/React%20Projects/watch-ecommerce-website/src/components/transition/ChronometerCurtain.tsx) & `.module.scss`: Pure GPU-accelerated curtain renderer with GSAP timelines.
-* [`src/components/transition/PageEnterAnimation.tsx`](file:///C:/Users/srima/OneDrive/Documents/React%20Projects/watch-ecommerce-website/src/components/transition/PageEnterAnimation.tsx) & `.module.scss`: Subtle entrance easing (`y: 20px -> 0px`, `opacity: 0 -> 1`) on page mount.
-* [`src/components/transition/PageTransitionProvider.tsx`](file:///C:/Users/srima/OneDrive/Documents/React%20Projects/watch-ecommerce-website/src/components/transition/PageTransitionProvider.tsx): Global provider intercepting internal links, coordinating router pushes, executing instant scroll-to-top resets, refreshing ScrollTrigger on reveal, handling browser Back/Forward (popstate), and enforcing a 1.6s failsafe timeout.
-* [`src/app/template.tsx`](file:///C:/Users/srima/OneDrive/Documents/React%20Projects/watch-ecommerce-website/src/app/template.tsx): Next.js App Router template wrapper triggering entrance animations per route.
-* **Accessibility:** Full `prefers-reduced-motion: reduce` support bypassing mechanical movements for a subtle, instant cross-fade.
-* **Build Validation:** `npm run build` &rarr; 27/27 static pages compiled successfully. `npm run lint` &rarr; 0 errors / 0 warnings.
+### 1. Design & Architectural Philosophy
+* **Aesthetic Standard:** Apple & Awwwards minimalist luxury standard. The website's clean, bright, pure-white (`#ffffff`) background is 100% preserved without any jarring dark full-screen curtains or artificial loading locks.
+* **Top Chronometer Hairline Gauge (`TopProgressBar.tsx`):**
+  * Precision 2px hairline pinned at `z-index: 999999` with a radiant gold-obsidian gradient (`linear-gradient(90deg, #1a1a1a, #c5a880, #1a1a1a)`).
+  * Smooth GSAP scrub that advances across the top on navigation, quickly completes to 100%, and dissolves seamlessly upon route resolution.
+* **Kinematic Exit & Staggered Reveal (`PageTransitionProvider.tsx` & `PageEnterAnimation.tsx`):**
+  * **Exit:** Current page gracefully dissolves with a subtle upward drift (`opacity: 0`, `y: -14px`, `filter: blur(2px)`) over 200ms.
+  * **Route Swap:** Instant scroll position reset (`window.scrollTo({ top: 0, left: 0, behavior: "instant" })`) and GSAP ScrollTrigger refresh.
+  * **Enter:** Incoming page mounts through Next.js `template.tsx` with a refined upward reveal (`opacity: 0 -> 1`, `y: 20px -> 0`, `filter: blur(4px) -> blur(0px)`) over 480ms with `power3.out` easing.
+* **Accessibility & Reduced Motion:** Instantaneous swap with no motion transforms when `prefers-reduced-motion: reduce` is active.
+* **Build Validation:** `npx tsc --noEmit` &rarr; 0 errors. `npm run lint` &rarr; 0 warnings / 0 errors. `npm run build` &rarr; 27/27 static routes compiled successfully.
 
 
 

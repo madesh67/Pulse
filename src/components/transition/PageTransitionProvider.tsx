@@ -10,111 +10,23 @@ import React, {
   useTransition,
 } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  ChronometerCurtain,
-  TransitionStatus,
-  TargetRouteInfo,
-} from "./ChronometerCurtain";
+import { TopProgressBar, TransitionStatus } from "./TopProgressBar";
 
 interface PageTransitionContextType {
   status: TransitionStatus;
   isTransitioning: boolean;
   navigateTo: (href: string) => void;
-  targetInfo: TargetRouteInfo;
 }
-
-const defaultTargetInfo: TargetRouteInfo = {
-  caliberCode: "CALIBER 00",
-  name: "FLAGSHIP SHOWCASE",
-  telemetry: "GENÈVE • 46°12'N 6°09'E • 0.01ms SYNC",
-};
 
 const PageTransitionContext = createContext<PageTransitionContextType>({
   status: "idle",
   isTransitioning: false,
   navigateTo: () => {},
-  targetInfo: defaultTargetInfo,
 });
 
 export const usePageTransition = () => useContext(PageTransitionContext);
-
-function getRouteMetadata(href: string): TargetRouteInfo {
-  try {
-    const url = new URL(href, typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
-    const path = url.pathname;
-    const search = url.searchParams;
-
-    if (path === "/" || path === "") {
-      return {
-        caliberCode: "CALIBER 00",
-        name: "FLAGSHIP SHOWCASE",
-        telemetry: "GENÈVE • 46°12'N 6°09'E • 0.01ms SYNC",
-      };
-    }
-
-    if (path.startsWith("/about")) {
-      return {
-        caliberCode: "CALIBER 01",
-        name: "MAISON ATELIER",
-        telemetry: "MANUFACTURE D'HORLOGERIE • SWISS HERITAGE",
-      };
-    }
-
-    if (path === "/shop" || path === "/shop/") {
-      const filter = search.get("filter");
-      const category = search.get("category");
-      if (filter === "popular") {
-        return {
-          caliberCode: "CALIBER 02",
-          name: "POPULAR CURATIONS",
-          telemetry: "SELECTED EXPRESSIONS OF PULSE",
-        };
-      }
-      if (category) {
-        return {
-          caliberCode: "CALIBER 02",
-          name: `${category.toUpperCase()} COLLECTION`,
-          telemetry: "PRECISION-ENGINEERED HOROLOGY",
-        };
-      }
-      return {
-        caliberCode: "CALIBER 02",
-        name: "ATELIER CATALOGUE",
-        telemetry: "20 PRECISION TIMEPIECES & ACCESSORIES",
-      };
-    }
-
-    if (path.startsWith("/shop/")) {
-      const slug = path.replace("/shop/", "").replace("/", "");
-      const cleanName = slug
-        .replace("pulse-", "")
-        .replace(/-/g, " ")
-        .toUpperCase();
-      return {
-        caliberCode: "CALIBER 03",
-        name: `${cleanName} CHRONOMETER`,
-        telemetry: "GRADE-5 TITANIUM • LTPO SILICON CALIBER",
-      };
-    }
-
-    if (path.startsWith("/debug")) {
-      return {
-        caliberCode: "DIAGNOSTIC",
-        name: "ENGINEERING MATRIX",
-        telemetry: "FRAME RENDER INSPECTION CONSOLE",
-      };
-    }
-
-    return {
-      caliberCode: "CHRONOMETRY",
-      name: "PRECISION NAVIGATION",
-      telemetry: "PULSE ATELIER • GENÈVE",
-    };
-  } catch {
-    return defaultTargetInfo;
-  }
-}
 
 export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
@@ -125,8 +37,8 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
   const fullPath = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
   const [prevPath, setPrevPath] = useState(fullPath);
   const [status, setStatus] = useState<TransitionStatus>("idle");
-  const [targetInfo, setTargetInfo] = useState<TargetRouteInfo>(defaultTargetInfo);
 
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const pendingRouteRef = useRef<string | null>(null);
   const safetyTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -138,18 +50,36 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     }
   }
 
-  // Scroll reset side-effect when entering new route
+  // Scroll reset and cleanup side-effect when entering new route
   useEffect(() => {
     if (status === "entering") {
       if (safetyTimerRef.current) {
         clearTimeout(safetyTimerRef.current);
         safetyTimerRef.current = null;
       }
+
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+      if (contentRef.current) {
+        gsap.set(contentRef.current, { opacity: 1, y: 0, filter: "none", clearProps: "all" });
+      }
+
+      if (typeof window !== "undefined") {
+        ScrollTrigger.refresh();
+      }
+
+      const enterTimer = setTimeout(() => {
+        setStatus("idle");
+        pendingRouteRef.current = null;
+      }, 350);
+
+      return () => {
+        clearTimeout(enterTimer);
+      };
     }
   }, [status]);
 
-  // Handle programmatically initiated transitions
+  // Programmatic navigation with smooth minimal kinematic exit
   const navigateTo = useCallback(
     (href: string) => {
       if (typeof window === "undefined") return;
@@ -180,56 +110,55 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
 
       if (status !== "idle") return;
 
-      const meta = getRouteMetadata(href);
-      setTargetInfo(meta);
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       pendingRouteRef.current = href;
+
+      if (prefersReducedMotion) {
+        startTransition(() => {
+          router.push(href);
+        });
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        return;
+      }
+
       setStatus("exiting");
 
-      // Safety timeout: Never leave user stuck on curtain if navigation takes too long or fails
+      // Safety timeout: Never lock up under any delayed navigation
       if (safetyTimerRef.current) clearTimeout(safetyTimerRef.current);
       safetyTimerRef.current = setTimeout(() => {
-        console.warn("Transition safety timeout reached. Forcing enter reveal.");
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        if (contentRef.current) {
+          gsap.set(contentRef.current, { opacity: 1, y: 0, filter: "none", clearProps: "all" });
+        }
         setStatus("entering");
-      }, 1600);
+      }, 1200);
+
+      // Minimalist exit dissolve
+      if (contentRef.current) {
+        gsap.to(contentRef.current, {
+          opacity: 0,
+          y: -14,
+          filter: "blur(2px)",
+          duration: 0.2,
+          ease: "power2.inOut",
+          onComplete: () => {
+            setStatus("navigating");
+            startTransition(() => {
+              router.push(href);
+            });
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          },
+        });
+      } else {
+        setStatus("navigating");
+        startTransition(() => {
+          router.push(href);
+        });
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      }
     },
-    [status]
+    [status, router]
   );
-
-  // Callback when exit curtain has covered the screen
-  const handleExitComplete = useCallback(() => {
-    if (!pendingRouteRef.current) {
-      setStatus("idle");
-      return;
-    }
-
-    setStatus("navigating");
-    const nextHref = pendingRouteRef.current;
-
-    // Execute route change
-    startTransition(() => {
-      router.push(nextHref);
-    });
-
-    // Reset window scroll position at route change
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }, [router]);
-
-  // Callback when enter curtain has finished parting
-  const handleEnterComplete = useCallback(() => {
-    setStatus("idle");
-    pendingRouteRef.current = null;
-
-    if (safetyTimerRef.current) {
-      clearTimeout(safetyTimerRef.current);
-      safetyTimerRef.current = null;
-    }
-
-    // Refresh ScrollTrigger instances across the newly revealed page
-    if (typeof window !== "undefined") {
-      ScrollTrigger.refresh();
-    }
-  }, []);
 
   // Global click interceptor for internal links
   useEffect(() => {
@@ -278,11 +207,10 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
 
         // Ignore hash only links on current page
         if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
-          // Allow hash anchor scrolling
           return;
         }
 
-        // Prevent default and run horological transition
+        // Prevent default and run minimalist transition
         event.preventDefault();
         navigateTo(url.pathname + url.search + url.hash);
       } catch {
@@ -301,8 +229,6 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
     if (typeof window === "undefined") return;
 
     const handlePopState = () => {
-      const meta = getRouteMetadata(window.location.pathname + window.location.search);
-      setTargetInfo(meta);
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       setStatus("entering");
     };
@@ -319,19 +245,15 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
         status,
         isTransitioning: status !== "idle",
         navigateTo,
-        targetInfo,
       }}
     >
-      {/* 1. Global Horological Chronometer Curtain */}
-      <ChronometerCurtain
-        status={status}
-        targetInfo={targetInfo}
-        onExitComplete={handleExitComplete}
-        onEnterComplete={handleEnterComplete}
-      />
+      {/* 1. Ultra-Refined Top Chronometer Hairline Progress Bar */}
+      <TopProgressBar status={status} />
 
-      {/* 2. Page Content */}
-      {children}
+      {/* 2. Transitionable Page Content Wrapper */}
+      <div ref={contentRef} style={{ width: "100%", minHeight: "100%" }}>
+        {children}
+      </div>
     </PageTransitionContext.Provider>
   );
 };

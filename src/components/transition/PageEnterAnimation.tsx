@@ -22,14 +22,15 @@ export const PageEnterAnimation: React.FC<{ children: React.ReactNode }> = ({ ch
         {
           opacity: 0,
           y: 20,
+          filter: "blur(4px)",
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
+          filter: "blur(0px)",
+          duration: 0.48,
           ease: "power3.out",
-          delay: 0.05,
-          clearProps: "transform",
+          clearProps: "transform,filter",
         }
       );
     }, containerRef);
