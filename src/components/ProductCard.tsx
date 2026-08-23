@@ -88,7 +88,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, gridMode = "2
         <p className={styles.descriptor}>{descriptor}</p>
 
         <div className={styles.footerRow}>
-          <span className={styles.materialTag}>{material}</span>
           <span className={styles.actionLink}>
             <span>EXPLORE</span>
             <span className={styles.arrow} aria-hidden="true">

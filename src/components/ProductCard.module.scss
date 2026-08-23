@@ -263,7 +263,7 @@
 
 .footerRow {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding-top: 14px;
   border-top: 1px solid #f4f4f8;
@@ -273,46 +273,33 @@
   }
 }
 
-.materialTag {
-  font-family: $font-sans;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #76767c;
-
-  @media (max-width: 640px) {
-    font-size: 0.62rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60%;
-  }
-}
-
 .actionLink {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: $font-sans;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #111111;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 
   .arrow {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     transition: transform 0.2s ease;
   }
 
-  .cardWrapper:hover & .arrow {
-    transform: translateX(3px);
+  .cardWrapper:hover & {
+    color: #000000;
+
+    .arrow {
+      transform: translateX(4px);
+    }
   }
 
   @media (max-width: 640px) {
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
   }
 }
