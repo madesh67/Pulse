@@ -15,6 +15,7 @@ import styles from "./page.module.scss";
 export default function Home() {
   const {
     progress,
+    loadedCount,
     totalCount,
     isFullyLoaded,
     getFrameImage,
@@ -43,7 +44,12 @@ export default function Home() {
       style={{ backgroundColor: fixedBgColor, overflow: "visible", height: "auto" }}
     >
       {/* Minimal PULSE logo with progress-filling wave */}
-      <Preloader isVisible={!isFullyLoaded} progress={progress} />
+      <Preloader
+        isVisible={!isFullyLoaded}
+        progress={progress}
+        loadedCount={loadedCount}
+        totalCount={totalCount}
+      />
 
       {isFullyLoaded && (
         <SmoothScrollProvider>

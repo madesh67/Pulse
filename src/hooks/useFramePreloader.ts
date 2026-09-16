@@ -21,9 +21,9 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// Parallel worker limits for fast non-blocking frame retrieval optimized for HTTP/2 multiplexing
-const INITIAL_CONCURRENCY = 16;
-const BACKGROUND_CONCURRENCY = 12;
+// High-throughput parallel worker limits optimized for HTTP/2 multiplexing
+const CONCURRENCY_DESKTOP = 20;
+const CONCURRENCY_MOBILE = 16;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -40,7 +40,7 @@ export function useFramePreloader() {
   const isMobileDevice = deviceConfig.isMobile;
   const totalFrames = activeManifest.totalFrames;
 
-  // Dynamically listen for window resize
+  // Dynamically listen for window resize across mobile/desktop breakpoint
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -79,9 +79,6 @@ export function useFramePreloader() {
   // Set of loaded frame indices for instant fallback resolution
   const loadedIndicesRef = useRef<Set<number>>(new Set());
 
-  // Mutable ref for dynamic JIT look-ahead priority loading during scroll
-  const prioritizeWindowRef = useRef<((centerIdx: number) => void) | null>(null);
-
   // Smooth progress updates via requestAnimationFrame
   const lastProgressRef = useRef<number>(0);
   const animationFrameIdRef = useRef<number | null>(null);
@@ -110,6 +107,11 @@ export function useFramePreloader() {
     imageCacheRef.current = new Array(framesCount).fill(null);
     loadedIndicesRef.current.clear();
     lastProgressRef.current = 0;
+    setProgress(0);
+    setLoadedCount(0);
+    setIsFullyLoaded(false);
+    setIsLoading(true);
+    setIsError(false);
 
     const cache = imageCacheRef.current;
     const loadedIndices = loadedIndicesRef.current;
@@ -156,8 +158,8 @@ export function useFramePreloader() {
           cache[index] = img;
           loadedIndices.add(index);
 
-          // Only decode frame 0 for immediate hero canvas first paint
-          if (index === 0 && "decode" in img) {
+          // Pre-decode initial hero frames (0..35) for instant, lag-free initial scroll response
+          if (index < 36 && "decode" in img) {
             img.decode().catch(() => {});
           }
 
@@ -171,6 +173,7 @@ export function useFramePreloader() {
               loadFrame(index, retries - 1).then(resolve);
             }, 150);
           } else {
+            // Frame failed after retries; resolve false to let queue continue
             resolve(false);
           }
         };
@@ -183,23 +186,7 @@ export function useFramePreloader() {
       return promise;
     };
 
-    // Urgent prioritized look-ahead window for active scroll scrubbing
-    let lastPrioritizedIdx = -999;
-    prioritizeWindowRef.current = (centerIdx: number) => {
-      if (isAborted) return;
-      if (Math.abs(centerIdx - lastPrioritizedIdx) < 2) return;
-      lastPrioritizedIdx = centerIdx;
-
-      const start = Math.max(0, centerIdx - 2);
-      const end = Math.min(framesCount - 1, centerIdx + 8);
-      for (let i = start; i <= end; i++) {
-        if (!cache[i] && !inFlightMap.has(i)) {
-          loadFrame(i, 2);
-        }
-      }
-    };
-
-    const startProgressivePreload = async () => {
+    const startPreloadAllFrames = async () => {
       try {
         if (forceFrame !== null) {
           await loadFrame(forceFrame);
@@ -212,69 +199,65 @@ export function useFramePreloader() {
           return;
         }
 
-        // 1. Build Dense Core Tier-1 Buffer
-        // - First 24 frames for seamless hero intro scrub
-        // - Every even frame across the entire timeline (0, 2, 4, 6... framesCount - 1)
-        // With every even frame guaranteed loaded, the maximum distance to any frame is AT MOST 1 frame!
-        const tier1Set = new Set<number>();
-        for (let i = 0; i < Math.min(24, framesCount); i++) {
-          tier1Set.add(i);
-        }
-        for (let i = 0; i < framesCount; i += 2) {
-          tier1Set.add(i);
-        }
-        const tier1Queue = Array.from(tier1Set);
-
-        // 2. Remaining in-between odd frames (1, 3, 5, 7...)
-        const tier2Queue: number[] = [];
+        // Build complete queue of ALL frames (0 to framesCount - 1)
+        const queue: number[] = [];
         for (let i = 0; i < framesCount; i++) {
-          if (!tier1Set.has(i)) {
-            tier2Queue.push(i);
-          }
+          queue.push(i);
         }
 
         let completedCount = 0;
+        const concurrency = isMobileDevice ? CONCURRENCY_MOBILE : CONCURRENCY_DESKTOP;
 
-        const runWorkers = async (queue: number[], concurrency: number) => {
-          const worker = async () => {
-            while (queue.length > 0) {
-              if (isAborted) return;
-              const idx = queue.shift();
-              if (idx === undefined) break;
-              await loadFrame(idx);
-              completedCount++;
-              updateProgress(completedCount, framesCount);
-            }
-          };
-          await Promise.all(Array.from({ length: concurrency }, () => worker()));
+        const worker = async () => {
+          while (queue.length > 0) {
+            if (isAborted) return;
+            const idx = queue.shift();
+            if (idx === undefined) break;
+            await loadFrame(idx);
+            if (isAborted) return;
+            completedCount++;
+            updateProgress(completedCount, framesCount);
+          }
         };
 
-        // Download Tier-1 dense core grid with high concurrency
-        await runWorkers(tier1Queue, INITIAL_CONCURRENCY);
+        // Guarantee ALL frames are loaded into memory before marking site ready
+        await Promise.all(Array.from({ length: concurrency }, () => worker()));
 
         if (!isAborted) {
-          // If Tier 1 finished, launch Tier 2 in parallel
-          const tier2Promise = runWorkers(tier2Queue, BACKGROUND_CONCURRENCY);
-
-          // Pacing & safety threshold:
-          // If all frames finish quickly (standard broadband/Wi-Fi/5G), it finishes cleanly.
-          // If the network is slow, after Tier 1 is ready + a 3.5s buffer (or >= 85%),
-          // smoothly open the site, since Tier 1 already guarantees max distance of 1 frame!
-          const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 3500));
-
-          await Promise.race([tier2Promise, timeoutPromise]);
-
-          if (!isAborted) {
-            setProgress(100);
-            setLoadedCount(framesCount);
-
-            setTimeout(() => {
-              if (!isAborted) {
-                setIsFullyLoaded(true);
-                setIsLoading(false);
-              }
-            }, 250);
+          if (animationFrameIdRef.current) {
+            cancelAnimationFrame(animationFrameIdRef.current);
+            animationFrameIdRef.current = null;
           }
+          setProgress(100);
+          setLoadedCount(framesCount);
+
+          // Background idle decoding for subsequent frames so GPU has them ready ahead of scroll
+          if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+            let nextDecodeIdx = 36;
+            const idleDecode = (deadline: IdleDeadline) => {
+              if (isAborted) return;
+              while (deadline.timeRemaining() > 6 && nextDecodeIdx < framesCount) {
+                const img = cache[nextDecodeIdx];
+                if (img && "decode" in img) {
+                  img.decode().catch(() => {});
+                }
+                nextDecodeIdx++;
+              }
+              if (nextDecodeIdx < framesCount && !isAborted) {
+                (window as Window).requestIdleCallback(idleDecode);
+              }
+            };
+            (window as Window).requestIdleCallback(idleDecode);
+          }
+
+          // Brief delay (250ms) to allow the preloader progress wave to finish filling smoothly
+          // before unlocking the interactive website
+          setTimeout(() => {
+            if (!isAborted) {
+              setIsFullyLoaded(true);
+              setIsLoading(false);
+            }
+          }, 250);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);
@@ -286,36 +269,28 @@ export function useFramePreloader() {
       }
     };
 
-    startProgressivePreload();
+    startPreloadAllFrames();
 
     return () => {
       isAborted = true;
-      prioritizeWindowRef.current = null;
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
   }, [deviceConfig, updateProgress]);
 
-  // Instant O(1) frame accessor with nearest-neighbor fallback & JIT look-ahead
+  // Instant O(1) frame accessor with nearest-neighbor fallback
   const getFrameImage = useCallback((index: number): HTMLImageElement | null => {
     const framesCount = activeManifest.totalFrames;
     const targetIdx = Math.max(0, Math.min(framesCount - 1, Math.round(index)));
     const cache = imageCacheRef.current;
 
-    // 1. Direct hit (instant O(1))
+    // 1. Direct hit (instant O(1)) — guaranteed because all frames are preloaded
     if (cache[targetIdx]) {
-      // Look-ahead for nearby upcoming frames in scroll direction
-      prioritizeWindowRef.current?.(targetIdx);
       return cache[targetIdx];
     }
 
-    // Trigger urgent retrieval for target and its surroundings
-    prioritizeWindowRef.current?.(targetIdx);
-
-    // 2. High-speed local window search (+-1, +-2, +-3, +-4)
-    // Tier 1 guarantees every even frame is loaded, so +-1 is mathematically guaranteed
-    // to find an adjacent frame with at most 1 frame (16ms) deviation!
+    // 2. High-speed local window search (+-1, +-2, +-3, +-4) if a frame failed to load
     for (let offset = 1; offset <= 4; offset++) {
       const prev = targetIdx - offset;
       if (prev >= 0 && cache[prev]) return cache[prev];

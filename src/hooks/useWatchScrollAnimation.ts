@@ -151,6 +151,11 @@ export function useWatchScrollAnimation({
         0.82
       );
 
+      // Refresh ScrollTrigger once DOM layout has fully settled
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+
     }, trigger);
 
     return () => {

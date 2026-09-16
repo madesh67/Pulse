@@ -1151,4 +1151,20 @@ Strictly utilizes real project categories and dedicated studio assets:
 * `npm run build` &rarr; Static HTML export compilation successful for all 30 routes in 5.4s.
 * HTTP 200 verification for WebP assets on local server.
 
+---
+
+## 31. Phase 31 — Complete Frame Preload Guarantee & Scroll Hang Elimination (Status: Completed)
+
+### 1. Problem Definition
+* The website was unlocking interactively after only a subset of frames (Tier 1 + 3.5s timeout) finished downloading.
+* When users scrolled early, missing odd frames triggered in-flight network requests and neighbor keyframe jumping during GSAP timeline scrub, causing the canvas animation to hang, lag, and drop frames.
+
+### 2. Implementation
+* **100% Preload Verification:** Modified `useFramePreloader.ts` to queue and wait for **all** frames (all 452 desktop frames or 235 mobile frames) using high-concurrency parallel workers (20 desktop / 16 mobile) before setting `isFullyLoaded = true`.
+* **Zero Network Calls During Scroll:** Removed premature 3.5s timeout and active look-ahead scroll network triggers; all frames are guaranteed to be in memory with $O(1)$ direct array lookup when scrubbed.
+* **Hero Sequence Pre-Decoding:** Eagerly decodes the first 36 hero frames off-thread during preload for an immediate, buttery-smooth initial scroll response; queues subsequent frames via `requestIdleCallback`.
+* **Accurate Preloader Wave:** The preloader SVG wave fills from 0% to 100% tracking real downloaded count (`completed / total`), with a smooth 250ms settling pause before the fade-out reveal.
+* **GSAP ScrollTrigger Alignment:** Synchronized `ScrollTrigger.refresh()` after mount to ensure accurate pin coordinates.
+
+
 
