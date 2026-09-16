@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: all;
   
   &.fadeOut {
@@ -32,7 +32,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .brandLogo {
@@ -75,7 +75,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  transition: clip-path 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: clip-path 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .waveFill {
@@ -85,3 +85,31 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.statusContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.statusPercentage {
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #000000;
+  font-variant-numeric: tabular-nums;
+}
+
+.statusDetail {
+  font-family: $font-sans;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.20em;
+  color: #8e8e93;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+

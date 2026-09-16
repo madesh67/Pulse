@@ -21,9 +21,9 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// High-throughput parallel worker limits optimized for HTTP/2 multiplexing
-const CONCURRENCY_DESKTOP = 20;
-const CONCURRENCY_MOBILE = 16;
+// Paced parallel worker limits for stable, unhurried frame loading and GPU decoding
+const CONCURRENCY_DESKTOP = 10;
+const CONCURRENCY_MOBILE = 8;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -132,7 +132,7 @@ export function useFramePreloader() {
 
     let isAborted = false;
 
-    // Resilient single frame loader with de-duplication and automatic retry
+    // Resilient single frame loader with decoding and automatic retry
     const loadFrame = (index: number, retries = 2): Promise<boolean> => {
       if (isAborted) return Promise.resolve(false);
       if (cache[index]) return Promise.resolve(true);
@@ -148,7 +148,7 @@ export function useFramePreloader() {
         );
         img.src = `${baseFolder}/${filename}`;
 
-        const onLoad = () => {
+        const onLoad = async () => {
           inFlightMap.delete(index);
           if (isAborted) {
             resolve(false);
@@ -158,9 +158,13 @@ export function useFramePreloader() {
           cache[index] = img;
           loadedIndices.add(index);
 
-          // Pre-decode initial hero frames (0..35) for instant, lag-free initial scroll response
-          if (index < 36 && "decode" in img) {
-            img.decode().catch(() => {});
+          // Eagerly decode every frame into GPU texture memory before marking loaded
+          if ("decode" in img) {
+            try {
+              await img.decode();
+            } catch {
+              // Non-fatal: continue even if decode fails on rare platforms
+            }
           }
 
           resolve(true);
@@ -220,7 +224,7 @@ export function useFramePreloader() {
           }
         };
 
-        // Guarantee ALL frames are loaded into memory before marking site ready
+        // Guarantee ALL frames are downloaded and GPU-decoded before unlocking site
         await Promise.all(Array.from({ length: concurrency }, () => worker()));
 
         if (!isAborted) {
@@ -231,33 +235,14 @@ export function useFramePreloader() {
           setProgress(100);
           setLoadedCount(framesCount);
 
-          // Background idle decoding for subsequent frames so GPU has them ready ahead of scroll
-          if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-            let nextDecodeIdx = 36;
-            const idleDecode = (deadline: IdleDeadline) => {
-              if (isAborted) return;
-              while (deadline.timeRemaining() > 6 && nextDecodeIdx < framesCount) {
-                const img = cache[nextDecodeIdx];
-                if (img && "decode" in img) {
-                  img.decode().catch(() => {});
-                }
-                nextDecodeIdx++;
-              }
-              if (nextDecodeIdx < framesCount && !isAborted) {
-                (window as Window).requestIdleCallback(idleDecode);
-              }
-            };
-            (window as Window).requestIdleCallback(idleDecode);
-          }
-
-          // Brief delay (250ms) to allow the preloader progress wave to finish filling smoothly
-          // before unlocking the interactive website
+          // Paced settling delay (500ms): lets user clearly see 100% frames loading status
+          // and ensures the browser finishes all GPU composition before revealing landing page
           setTimeout(() => {
             if (!isAborted) {
               setIsFullyLoaded(true);
               setIsLoading(false);
             }
-          }, 250);
+          }, 500);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);

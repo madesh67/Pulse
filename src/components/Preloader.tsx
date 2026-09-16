@@ -10,7 +10,12 @@ interface PreloaderProps {
   totalCount?: number;
 }
 
-export const Preloader: React.FC<PreloaderProps> = ({ isVisible, progress = 0 }) => {
+export const Preloader: React.FC<PreloaderProps> = ({
+  isVisible,
+  progress = 0,
+  loadedCount,
+  totalCount,
+}) => {
   const clampedProgress = Math.max(0, Math.min(100, Math.round(progress)));
 
   return (
@@ -46,6 +51,16 @@ export const Preloader: React.FC<PreloaderProps> = ({ isVisible, progress = 0 })
               />
             </svg>
           </div>
+        </div>
+
+        {/* Frame Loading Status & Percentage */}
+        <div className={styles.statusContainer}>
+          <span className={styles.statusPercentage}>{clampedProgress}%</span>
+          {totalCount && totalCount > 0 ? (
+            <span className={styles.statusDetail}>
+              {loadedCount ?? Math.round((clampedProgress / 100) * totalCount)} / {totalCount} FRAMES
+            </span>
+          ) : null}
         </div>
       </div>
     </div>

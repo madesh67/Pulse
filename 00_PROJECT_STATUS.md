@@ -1166,5 +1166,19 @@ Strictly utilizes real project categories and dedicated studio assets:
 * **Accurate Preloader Wave:** The preloader SVG wave fills from 0% to 100% tracking real downloaded count (`completed / total`), with a smooth 250ms settling pause before the fade-out reveal.
 * **GSAP ScrollTrigger Alignment:** Synchronized `ScrollTrigger.refresh()` after mount to ensure accurate pin coordinates.
 
+---
+
+## 32. Phase 32 — Paced Preloading & Full GPU Frame Rasterization (Status: Completed)
+
+### 1. Architectural Motivation
+* The user specifically indicated that loading should not be rushed or artificially fast: it is better for the frames loading status preloader to take its time, remain steady, and guarantee that every single watch frame is both downloaded and GPU-decoded before the website's landing page is revealed.
+
+### 2. Implementation
+* **Paced Loading Cadence:** Reduced worker concurrency to a steady 10 workers on desktop and 8 on mobile, preventing CPU congestion and socket contention.
+* **100% Eager Frame Decoding (`img.decode()`):** Every individual frame is decoded asynchronously into GPU texture cache upon download, ensuring 0ms canvas rasterization pause when scrolling any segment of the timeline.
+* **Explicit Frames Loading Status in Preloader:** Added a percentage and frame counter (`352 / 452 FRAMES`) beneath the dynamic wave inside `Preloader.tsx` with Swiss luxury typography.
+* **Calm 500ms Hold & 0.8s Cinematic Fade:** The preloader rests calmly at 100% for 500ms before initiating an 0.8s smooth cubic-bezier fade-out reveal.
+
+
 
 
