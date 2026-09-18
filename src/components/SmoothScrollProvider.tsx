@@ -55,8 +55,8 @@ export const SmoothScrollProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     gsap.ticker.add(updateTicker);
 
-    // Disable GSAP ticker lagSmoothing to prevent rendering/update drift
-    gsap.ticker.lagSmoothing(0);
+    // Enable responsive lagSmoothing to absorb initial tick jitters and prevent scroll hanging
+    gsap.ticker.lagSmoothing(500, 33);
 
     return () => {
       lenis.destroy();

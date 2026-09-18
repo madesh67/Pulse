@@ -21,9 +21,9 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// Paced parallel worker limits for stable, unhurried frame loading and GPU decoding
-const CONCURRENCY_DESKTOP = 10;
-const CONCURRENCY_MOBILE = 8;
+// Controlled, steady worker concurrency so frames load thoroughly without rushing
+const CONCURRENCY_DESKTOP = 4;
+const CONCURRENCY_MOBILE = 3;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -40,24 +40,29 @@ export function useFramePreloader() {
   const isMobileDevice = deviceConfig.isMobile;
   const totalFrames = activeManifest.totalFrames;
 
-  // Dynamically listen for window resize across mobile/desktop breakpoint
+  // Immediately synchronize mobile/desktop breakpoint on client mount and resize
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const checkDevice = () => {
+      const isMobile = window.innerWidth < 768;
+      setDeviceConfig((prev) => {
+        if (prev.isMobile === isMobile) return prev;
+        return {
+          isMobile,
+          manifest: isMobile ? mobileManifestData : desktopManifestData,
+          folder: isMobile ? "/assets/frames-mobile" : "/assets/frames",
+        };
+      });
+    };
+
+    // Check immediately on mount
+    checkDevice();
 
     let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const isMobile = window.innerWidth < 768;
-        setDeviceConfig((prev) => {
-          if (prev.isMobile === isMobile) return prev;
-          return {
-            isMobile,
-            manifest: isMobile ? mobileManifestData : desktopManifestData,
-            folder: isMobile ? "/assets/frames-mobile" : "/assets/frames",
-          };
-        });
-      }, 150);
+      resizeTimer = setTimeout(checkDevice, 200);
     };
 
     window.addEventListener("resize", handleResize);
@@ -115,7 +120,7 @@ export function useFramePreloader() {
 
     const cache = imageCacheRef.current;
     const loadedIndices = loadedIndicesRef.current;
-    const inFlightMap = new Map<number, Promise<boolean>>();
+    const inFlightMap = new Map<number, Promise<HTMLImageElement | null>>();
 
     // Single-frame debugging mode (?frame=120)
     let forceFrame: number | null = null;
@@ -132,58 +137,81 @@ export function useFramePreloader() {
 
     let isAborted = false;
 
-    // Resilient single frame loader with decoding and automatic retry
-    const loadFrame = (index: number, retries = 2): Promise<boolean> => {
-      if (isAborted) return Promise.resolve(false);
-      if (cache[index]) return Promise.resolve(true);
+    // Resilient frame loader: attaches handlers before src, decodes off-thread, retries reliably
+    const loadFrame = (index: number, maxRetries = 5): Promise<HTMLImageElement | null> => {
+      if (isAborted) return Promise.resolve(null);
+      if (cache[index] && cache[index]!.complete && cache[index]!.naturalWidth > 0) {
+        return Promise.resolve(cache[index]);
+      }
 
       const existing = inFlightMap.get(index);
       if (existing) return existing;
 
-      const promise = new Promise<boolean>((resolve) => {
-        const img = new Image();
-        const filename = chosenManifest.filenamePattern.replace(
-          "{index}",
-          index.toString().padStart(3, "0")
-        );
-        img.src = `${baseFolder}/${filename}`;
+      const promise = new Promise<HTMLImageElement | null>((resolve) => {
+        let attempt = 0;
 
-        const onLoad = async () => {
-          inFlightMap.delete(index);
+        const tryLoad = () => {
           if (isAborted) {
-            resolve(false);
+            inFlightMap.delete(index);
+            resolve(null);
             return;
           }
 
-          cache[index] = img;
-          loadedIndices.add(index);
+          const img = new Image();
+          const filename = chosenManifest.filenamePattern.replace(
+            "{index}",
+            index.toString().padStart(3, "0")
+          );
+          const fullSrc = `${baseFolder}/${filename}`;
 
-          // Eagerly decode every frame into GPU texture memory before marking loaded
-          if ("decode" in img) {
-            try {
-              await img.decode();
-            } catch {
-              // Non-fatal: continue even if decode fails on rare platforms
+          const handleSuccess = async () => {
+            inFlightMap.delete(index);
+            if (isAborted) {
+              resolve(null);
+              return;
             }
-          }
 
-          resolve(true);
+            if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+              handleRetry();
+              return;
+            }
+
+            // Eagerly decompress and rasterize into GPU texture memory
+            if ("decode" in img) {
+              try {
+                await img.decode();
+              } catch {
+                // Non-fatal fallback
+              }
+            }
+
+            cache[index] = img;
+            loadedIndices.add(index);
+            resolve(img);
+          };
+
+          const handleRetry = () => {
+            attempt++;
+            if (attempt <= maxRetries && !isAborted) {
+              const delay = Math.min(1000, 150 * attempt);
+              setTimeout(tryLoad, delay);
+            } else {
+              inFlightMap.delete(index);
+              resolve(null);
+            }
+          };
+
+          // Always set handlers before src to guarantee capture on cached images
+          img.onload = handleSuccess;
+          img.onerror = handleRetry;
+          img.src = fullSrc;
+
+          if (img.complete && img.naturalWidth > 0) {
+            handleSuccess();
+          }
         };
 
-        const onError = () => {
-          inFlightMap.delete(index);
-          if (retries > 0 && !isAborted) {
-            setTimeout(() => {
-              loadFrame(index, retries - 1).then(resolve);
-            }, 150);
-          } else {
-            // Frame failed after retries; resolve false to let queue continue
-            resolve(false);
-          }
-        };
-
-        img.onload = onLoad;
-        img.onerror = onError;
+        tryLoad();
       });
 
       inFlightMap.set(index, promise);
@@ -203,7 +231,7 @@ export function useFramePreloader() {
           return;
         }
 
-        // Build complete queue of ALL frames (0 to framesCount - 1)
+        // Build complete sequential queue of ALL frames (0 to framesCount - 1)
         const queue: number[] = [];
         for (let i = 0; i < framesCount; i++) {
           queue.push(i);
@@ -217,15 +245,39 @@ export function useFramePreloader() {
             if (isAborted) return;
             const idx = queue.shift();
             if (idx === undefined) break;
-            await loadFrame(idx);
+            const img = await loadFrame(idx);
             if (isAborted) return;
-            completedCount++;
-            updateProgress(completedCount, framesCount);
+            if (img) {
+              completedCount++;
+              updateProgress(completedCount, framesCount);
+            } else {
+              // If frame failed all retries, push back to end of queue to re-try
+              queue.push(idx);
+            }
           }
         };
 
-        // Guarantee ALL frames are downloaded and GPU-decoded before unlocking site
+        // Step 1: Process full queue through steady workers
         await Promise.all(Array.from({ length: concurrency }, () => worker()));
+
+        if (isAborted) return;
+
+        // Step 2: Strict 100% verification pass — ensure EVERY SINGLE frame is loaded and valid
+        for (let i = 0; i < framesCount; i++) {
+          if (isAborted) return;
+          if (!cache[i] || !cache[i]!.complete || cache[i]!.naturalWidth === 0) {
+            await loadFrame(i, 5);
+          }
+        }
+
+        if (isAborted) return;
+
+        // Step 3: Verify initial frame 0 is decoded and ready for first paint
+        if (cache[0] && "decode" in cache[0]!) {
+          try {
+            await cache[0]!.decode();
+          } catch {}
+        }
 
         if (!isAborted) {
           if (animationFrameIdRef.current) {
@@ -235,14 +287,14 @@ export function useFramePreloader() {
           setProgress(100);
           setLoadedCount(framesCount);
 
-          // Paced settling delay (500ms): lets user clearly see 100% frames loading status
-          // and ensures the browser finishes all GPU composition before revealing landing page
+          // Paced settling delay (700ms): ensures user clearly sees 100% completion
+          // and allows the browser to finalize GPU memory before unlocking the page
           setTimeout(() => {
             if (!isAborted) {
               setIsFullyLoaded(true);
               setIsLoading(false);
             }
-          }, 500);
+          }, 700);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);

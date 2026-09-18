@@ -86,9 +86,15 @@ export const SmartwatchCanvas = React.forwardRef<SmartwatchCanvasRef, Smartwatch
         return;
       }
 
-      const rect = container.getBoundingClientRect();
-      const width = Math.floor(rect.width);
-      const height = Math.floor(rect.height);
+      let width = dimensionsRef.current.width;
+      let height = dimensionsRef.current.height;
+
+      if (width <= 0 || height <= 0) {
+        const rect = container.getBoundingClientRect();
+        width = Math.floor(rect.width);
+        height = Math.floor(rect.height);
+        dimensionsRef.current = { width, height };
+      }
 
       if (width <= 0 || height <= 0) return;
 
@@ -275,8 +281,10 @@ export const SmartwatchCanvas = React.forwardRef<SmartwatchCanvasRef, Smartwatch
       // Get background color for the current frame
       const bgColor = getFrameBgColor(currentFrame);
 
-      // Apply color to the parent container so margins blend perfectly
-      container.style.backgroundColor = bgColor;
+      // Apply color to the parent container so margins blend perfectly (only if changed)
+      if (container.style.backgroundColor !== bgColor) {
+        container.style.backgroundColor = bgColor;
+      }
 
       // Clear and fill the canvas background
       ctx.fillStyle = bgColor;

@@ -1177,7 +1177,22 @@ Strictly utilizes real project categories and dedicated studio assets:
 * **Paced Loading Cadence:** Reduced worker concurrency to a steady 10 workers on desktop and 8 on mobile, preventing CPU congestion and socket contention.
 * **100% Eager Frame Decoding (`img.decode()`):** Every individual frame is decoded asynchronously into GPU texture cache upon download, ensuring 0ms canvas rasterization pause when scrolling any segment of the timeline.
 * **Explicit Frames Loading Status in Preloader:** Added a percentage and frame counter (`352 / 452 FRAMES`) beneath the dynamic wave inside `Preloader.tsx` with Swiss luxury typography.
-* **Calm 500ms Hold & 0.8s Cinematic Fade:** The preloader rests calmly at 100% for 500ms before initiating an 0.8s smooth cubic-bezier fade-out reveal.
+## 33. Phase 33 — Unhurried Frame-by-Frame Preload, Layout Thrashing Elimination & Clean Reveal (Status: Completed)
+
+### 1. Root Cause Analysis
+* **Premature Perception:** High concurrency (10-20 workers) caused network frames to stream too quickly, creating the impression that loading was artificially rushed.
+* **Layout Thrashing in `SmartwatchCanvas`:** `renderFrame()` called `container.getBoundingClientRect()` and mutated `container.style.backgroundColor` on every scroll frame. This caused forced synchronous reflows on the main thread during initial scroll, leading to noticeable animation stutter.
+* **Disabled LagSmoothing:** `gsap.ticker.lagSmoothing(0)` prevented GSAP from absorbing initial tick jitter, causing visual freezes on the first user interaction.
+* **Text Overlap During Transition:** The preloader content remained visible while the white background began fading out, causing preloader text to superimpose over landing page copy.
+
+### 2. Implementation
+* **Unhurried Frame Stream (`CONCURRENCY = 4`):** Lowered worker pool to 4 on desktop (3 on mobile) for a steady, thorough loading cadence that does not rush or saturate the browser.
+* **Strict 100% Verification Pass:** In `useFramePreloader.ts`, after the queue empties, a secondary verification loop inspects every frame from $0 \dots N-1$ to guarantee all images are fully downloaded, decoded, and confirmed with valid dimensions. Missing or failed frames are re-fetched with up to 5 retries.
+* **Client-Side Breakpoint Detection on Mount:** Added immediate device detection in `useFramePreloader` so mobile viewports correctly load the mobile manifest from the first tick without waiting for a resize event.
+* **Zero Reflow Canvas Rendering:** Replaced `getBoundingClientRect()` in `renderFrame()` with cached dimensions from `dimensionsRef.current` (populated by `ResizeObserver`). Guarded `backgroundColor` style mutation to only execute when the color changes.
+* **GSAP lagSmoothing Restored:** Enabled `gsap.ticker.lagSmoothing(500, 33)` to smoothly absorb initial user input jitter.
+* **Clean Preloader Fade:** `.preloaderContent` fades out cleanly in 200ms before the white curtain overlay reveals the landing page, eliminating any text overlapping or visual ghosting.
+
 
 
 
