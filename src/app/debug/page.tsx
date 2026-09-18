@@ -91,8 +91,6 @@ export default function DebugPage() {
       {/* Technical loader overlays until frames are fully loaded */}
       <Preloader
         progress={progress}
-        loadedCount={loadedCount}
-        totalCount={totalCount}
         isVisible={!isFullyLoaded}
       />
 

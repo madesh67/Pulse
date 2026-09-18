@@ -93,30 +93,3 @@
   stroke-linejoin: round;
 }
 
-.statusContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-}
-
-.statusPercentage {
-  font-family: $font-sans;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: #000000;
-  font-variant-numeric: tabular-nums;
-}
-
-.statusDetail {
-  font-family: $font-sans;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.20em;
-  color: #8e8e93;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-}
-

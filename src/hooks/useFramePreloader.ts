@@ -149,6 +149,7 @@ export function useFramePreloader() {
 
       const promise = new Promise<HTMLImageElement | null>((resolve) => {
         let attempt = 0;
+        let settled = false;
 
         const tryLoad = () => {
           if (isAborted) {
@@ -165,6 +166,8 @@ export function useFramePreloader() {
           const fullSrc = `${baseFolder}/${filename}`;
 
           const handleSuccess = async () => {
+            if (settled) return;
+            settled = true;
             inFlightMap.delete(index);
             if (isAborted) {
               resolve(null);
@@ -172,17 +175,9 @@ export function useFramePreloader() {
             }
 
             if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+              settled = false;
               handleRetry();
               return;
-            }
-
-            // Eagerly decompress and rasterize into GPU texture memory
-            if ("decode" in img) {
-              try {
-                await img.decode();
-              } catch {
-                // Non-fatal fallback
-              }
             }
 
             cache[index] = img;
@@ -191,11 +186,13 @@ export function useFramePreloader() {
           };
 
           const handleRetry = () => {
+            if (settled) return;
             attempt++;
             if (attempt <= maxRetries && !isAborted) {
               const delay = Math.min(1000, 150 * attempt);
               setTimeout(tryLoad, delay);
             } else {
+              settled = true;
               inFlightMap.delete(index);
               resolve(null);
             }
@@ -272,11 +269,14 @@ export function useFramePreloader() {
 
         if (isAborted) return;
 
-        // Step 3: Verify initial frame 0 is decoded and ready for first paint
-        if (cache[0] && "decode" in cache[0]!) {
-          try {
-            await cache[0]!.decode();
-          } catch {}
+        // Step 3: Verify initial hero frames (0 to 45) are decoded and ready for first paint & scroll
+        for (let i = 0; i < Math.min(45, framesCount); i++) {
+          if (isAborted) return;
+          if (cache[i] && "decode" in cache[i]!) {
+            try {
+              await cache[i]!.decode();
+            } catch {}
+          }
         }
 
         if (!isAborted) {
@@ -287,14 +287,33 @@ export function useFramePreloader() {
           setProgress(100);
           setLoadedCount(framesCount);
 
-          // Paced settling delay (700ms): ensures user clearly sees 100% completion
-          // and allows the browser to finalize GPU memory before unlocking the page
+          // Paced settling delay (600ms): lets user cleanly see the completed black wave
+          // and ensures the browser finishes initial layout before unlocking the page
           setTimeout(() => {
             if (!isAborted) {
               setIsFullyLoaded(true);
               setIsLoading(false);
+
+              // Background idle decoding for subsequent frames so GPU has them ready ahead of scroll
+              if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                let nextDecodeIdx = 45;
+                const idleDecode = (deadline: IdleDeadline) => {
+                  if (isAborted) return;
+                  while (deadline.timeRemaining() > 6 && nextDecodeIdx < framesCount) {
+                    const img = cache[nextDecodeIdx];
+                    if (img && "decode" in img) {
+                      img.decode().catch(() => {});
+                    }
+                    nextDecodeIdx++;
+                  }
+                  if (nextDecodeIdx < framesCount && !isAborted) {
+                    (window as Window).requestIdleCallback(idleDecode);
+                  }
+                };
+                (window as Window).requestIdleCallback(idleDecode);
+              }
             }
-          }, 700);
+          }, 600);
         }
       } catch (err) {
         console.warn("Preloader notice:", err);

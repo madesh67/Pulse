@@ -47,8 +47,6 @@ export default function Home() {
       <Preloader
         isVisible={!isFullyLoaded}
         progress={progress}
-        loadedCount={loadedCount}
-        totalCount={totalCount}
       />
 
       {isFullyLoaded && (
