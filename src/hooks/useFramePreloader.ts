@@ -21,9 +21,14 @@ interface ManifestData {
 const desktopManifestData = desktopManifest as unknown as ManifestData;
 const mobileManifestData = mobileManifest as unknown as ManifestData;
 
-// Controlled, steady worker concurrency so frames load thoroughly without rushing
-const CONCURRENCY_DESKTOP = 4;
-const CONCURRENCY_MOBILE = 3;
+// High-throughput multiplexed parallel worker limits for modern HTTP/2 CDN
+const CONCURRENCY_DESKTOP = 20;
+const CONCURRENCY_MOBILE = 16;
+
+// Target loading animation duration: 5 seconds total (4.5s smooth wave fill + 0.5s finish pause)
+const TARGET_PROGRESS_DURATION_MS = 4500;
+const SETTLING_DELAY_MS = 500;
+const CRITICAL_HERO_FRAMES = 60;
 
 function getInitialConfig(): { isMobile: boolean; manifest: ManifestData; folder: string } {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -180,6 +185,13 @@ export function useFramePreloader() {
               return;
             }
 
+            // Eagerly decode initial hero frames into GPU texture memory
+            if (index < 45 && "decode" in img) {
+              try {
+                await img.decode();
+              } catch {}
+            }
+
             cache[index] = img;
             loadedIndices.add(index);
             resolve(img);
@@ -189,7 +201,7 @@ export function useFramePreloader() {
             if (settled) return;
             attempt++;
             if (attempt <= maxRetries && !isAborted) {
-              const delay = Math.min(1000, 150 * attempt);
+              const delay = Math.min(800, 100 * attempt);
               setTimeout(tryLoad, delay);
             } else {
               settled = true;
@@ -228,93 +240,103 @@ export function useFramePreloader() {
           return;
         }
 
-        // Build complete sequential queue of ALL frames (0 to framesCount - 1)
-        const queue: number[] = [];
-        for (let i = 0; i < framesCount; i++) {
-          queue.push(i);
+        // Build 3-tier prioritized download list:
+        // Tier 1: Dense Hero frames (0 to 60) for instant startup & initial scroll
+        const tier1: number[] = [];
+        for (let i = 0; i < Math.min(CRITICAL_HERO_FRAMES, framesCount); i++) {
+          tier1.push(i);
         }
 
-        let completedCount = 0;
+        // Tier 2: Timeline anchor spine across remaining sequence (every 2nd frame: 62, 64, 66...)
+        const tier2: number[] = [];
+        for (let i = CRITICAL_HERO_FRAMES; i < framesCount; i += 2) {
+          tier2.push(i);
+        }
+
+        // Tier 3: In-between interstitial frames (61, 63, 65...)
+        const tier3: number[] = [];
+        for (let i = CRITICAL_HERO_FRAMES + 1; i < framesCount; i += 2) {
+          tier3.push(i);
+        }
+
+        const fullQueue = [...tier1, ...tier2, ...tier3];
         const concurrency = isMobileDevice ? CONCURRENCY_MOBILE : CONCURRENCY_DESKTOP;
 
+        let completedCount = 0;
         const worker = async () => {
-          while (queue.length > 0) {
+          while (fullQueue.length > 0) {
             if (isAborted) return;
-            const idx = queue.shift();
+            const idx = fullQueue.shift();
             if (idx === undefined) break;
             const img = await loadFrame(idx);
             if (isAborted) return;
             if (img) {
               completedCount++;
-              updateProgress(completedCount, framesCount);
-            } else {
-              // If frame failed all retries, push back to end of queue to re-try
-              queue.push(idx);
+              setLoadedCount(completedCount);
             }
           }
         };
 
-        // Step 1: Process full queue through steady workers
-        await Promise.all(Array.from({ length: concurrency }, () => worker()));
+        // Launch high-throughput parallel download workers
+        Array.from({ length: concurrency }, () => worker());
 
-        if (isAborted) return;
+        // Target 5-second smooth loading animation timer
+        const startTime = performance.now();
+        let isDone = false;
 
-        // Step 2: Strict 100% verification pass — ensure EVERY SINGLE frame is loaded and valid
-        for (let i = 0; i < framesCount; i++) {
-          if (isAborted) return;
-          if (!cache[i] || !cache[i]!.complete || cache[i]!.naturalWidth === 0) {
-            await loadFrame(i, 5);
+        const progressTimer = setInterval(() => {
+          if (isAborted || isDone) {
+            clearInterval(progressTimer);
+            return;
           }
-        }
 
-        if (isAborted) return;
+          const elapsed = performance.now() - startTime;
+          const timeFrac = Math.min(1, elapsed / TARGET_PROGRESS_DURATION_MS);
 
-        // Step 3: Verify initial hero frames (0 to 45) are decoded and ready for first paint & scroll
-        for (let i = 0; i < Math.min(45, framesCount); i++) {
-          if (isAborted) return;
-          if (cache[i] && "decode" in cache[i]!) {
-            try {
-              await cache[i]!.decode();
-            } catch {}
-          }
-        }
+          // Ease-out progress curve: 0 -> 100% over TARGET_PROGRESS_DURATION_MS (4.5s)
+          const eased = 1 - Math.pow(1 - timeFrac, 1.6);
+          const timeProgress = Math.round(eased * 99);
 
-        if (!isAborted) {
-          if (animationFrameIdRef.current) {
-            cancelAnimationFrame(animationFrameIdRef.current);
-            animationFrameIdRef.current = null;
-          }
-          setProgress(100);
-          setLoadedCount(framesCount);
+          setProgress((prev) => Math.max(prev, timeProgress));
 
-          // Paced settling delay (600ms): lets user cleanly see the completed black wave
-          // and ensures the browser finishes initial layout before unlocking the page
-          setTimeout(() => {
-            if (!isAborted) {
-              setIsFullyLoaded(true);
-              setIsLoading(false);
+          // At target time (4.5s), verify initial hero frame 0 is ready
+          const heroReady = loadedIndices.has(0) && loadedIndices.size >= Math.min(20, framesCount);
 
-              // Background idle decoding for subsequent frames so GPU has them ready ahead of scroll
-              if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-                let nextDecodeIdx = 45;
-                const idleDecode = (deadline: IdleDeadline) => {
-                  if (isAborted) return;
-                  while (deadline.timeRemaining() > 6 && nextDecodeIdx < framesCount) {
-                    const img = cache[nextDecodeIdx];
-                    if (img && "decode" in img) {
-                      img.decode().catch(() => {});
+          if (elapsed >= TARGET_PROGRESS_DURATION_MS && heroReady) {
+            isDone = true;
+            clearInterval(progressTimer);
+
+            // Progress hits 100% solid black
+            setProgress(100);
+
+            // Settling delay (500ms) totaling exactly 5.0 seconds
+            setTimeout(() => {
+              if (!isAborted) {
+                setIsFullyLoaded(true);
+                setIsLoading(false);
+
+                // Background idle decoding for subsequent frames so GPU has them ready ahead of scroll
+                if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                  let nextDecodeIdx = 45;
+                  const idleDecode = (deadline: IdleDeadline) => {
+                    if (isAborted) return;
+                    while (deadline.timeRemaining() > 6 && nextDecodeIdx < framesCount) {
+                      const img = cache[nextDecodeIdx];
+                      if (img && "decode" in img) {
+                        img.decode().catch(() => {});
+                      }
+                      nextDecodeIdx++;
                     }
-                    nextDecodeIdx++;
-                  }
-                  if (nextDecodeIdx < framesCount && !isAborted) {
-                    (window as Window).requestIdleCallback(idleDecode);
-                  }
-                };
-                (window as Window).requestIdleCallback(idleDecode);
+                    if (nextDecodeIdx < framesCount && !isAborted) {
+                      (window as Window).requestIdleCallback(idleDecode);
+                    }
+                  };
+                  (window as Window).requestIdleCallback(idleDecode);
+                }
               }
-            }
-          }, 600);
-        }
+            }, SETTLING_DELAY_MS);
+          }
+        }, 33);
       } catch (err) {
         console.warn("Preloader notice:", err);
         if (!isAborted) {
